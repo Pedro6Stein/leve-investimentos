@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  fullName     String   @db.VarChar(150)
+  birthDate    DateTime @db.Date
+  landline     String?  @db.VarChar(20)
+  mobile       String   @db.VarChar(20)
+  email        String   @unique @db.VarChar(100)
+  passwordHash String   @db.VarChar(255)
+  address      String   @db.VarChar(255)
+  photo        String?  @db.VarChar(MAX)
+  isManager    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  managedTasks  Task[] @relation("ManagerTasks")
+  assignedTasks Task[] @relation("AssigneeTasks")
+
+  @@map("Users")
+}
+
+model Task {
+  id          String    @id @default(uuid())
+  managerId   String
+  assigneeId  String
+  description String    @db.Text
+  dueDate     DateTime  @db.Date
+  status      Int       @default(1) // 1 = Pendente, 2 = Concluída
+  createdAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  manager  User @relation("ManagerTasks", fields: [managerId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  assignee User @relation("AssigneeTasks", fields: [assigneeId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  @@map("Tasks")
+}
