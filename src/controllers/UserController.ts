@@ -29,7 +29,7 @@ export class UserController {
                 res.status(400).json({ error: 'Campos obrigatórios ausentes.' });
                 return;
             }
-            
+
             const bcrypt = require('bcrypt');
             const passwordHash = await bcrypt.hash(password, 10);
 
@@ -52,6 +52,7 @@ export class UserController {
                 res.status(400).json({ error: 'Este e-mail já está cadastrado.' });
                 return;
             }
+            console.error("ERRO REAL NA CRIAÇÃO DA TAREFA:", error);
             res.status(500).json({ error: 'Erro ao criar usuário.' });
         }
     };
