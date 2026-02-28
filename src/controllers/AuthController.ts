@@ -18,6 +18,8 @@ export class AuthController {
             const result = await this.authService.login(email, password);
             res.status(200).json(result);
         } catch (error: any) {
+            console.error("ERRO REAL NO LOGIN:", error); 
+            
             res.status(401).json({ error: 'Credenciais inválidas.' });
         }
     }
