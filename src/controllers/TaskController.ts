@@ -48,6 +48,26 @@ export class TaskController {
             res.status(500).json({ error: 'Erro ao listar tarefas.' });
         }
     };
+
+    listManagedTasks = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+        try {
+            const managerId = req.user?.userId;
+            const tasks = await prisma.task.findMany({
+                where: { managerId },
+                include: {
+    
+                    assignee: { select: { fullName: true, email: true } }
+                },
+                orderBy: { dueDate: 'asc' }
+            });
+
+            res.status(200).json(tasks);
+        } catch (error) {
+            console.error("ERRO AO LISTAR TAREFAS DA EQUIPA:", error);
+            res.status(500).json({ error: 'Erro ao listar tarefas da equipa.' });
+        }
+    };
+    
     //Se task completada ---> muda a data e coloca um "check"
     complete = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
         try {

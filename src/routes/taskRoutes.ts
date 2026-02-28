@@ -9,4 +9,5 @@ const taskController = new TaskController();
 taskRoutes.post('/', ensureManager, taskController.create);
 taskRoutes.get('/my', ensureAuthenticated, taskController.listMyTasks); //Apenas usuários logados VÊEM as suas próprias tarefas
 taskRoutes.patch('/:id/complete', ensureAuthenticated, taskController.complete);//Apenas usuários logados CONCLUEM tarefas
+taskRoutes.get('/managed', ensureManager, taskController.listManagedTasks); //Apenas gestores vêem as tarefas que atribuíram à equipa
 export { taskRoutes };
