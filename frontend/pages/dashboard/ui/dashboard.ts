@@ -1,45 +1,42 @@
-﻿import { loadMyTasks } from '../../../features/task/list/api/loadTasks.js';
+﻿declare const UIkit: any;
+import { loadMyTasks, loadManagedTasks, Task } from '../../services/taskService.js';
+import { AuthUser } from '../../services/authService.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('@Leve:token');
     const userRaw = localStorage.getItem('@Leve:user');
 
-    // GUARDA DE ROTA: Segurança FSD
     if (!token || !userRaw) {
-        window.location.href = '../../login/ui/index.html';
+        window.location.href = '../login/index.html';
         return;
     }
 
-    const user = JSON.parse(userRaw);
+    const user: AuthUser = JSON.parse(userRaw);
 
-    // IDENTIFICAÇÃO
     const userNameDisplay = document.getElementById('userNameDisplay');
     if (userNameDisplay) userNameDisplay.innerText = user.fullName;
 
-    // PERMISSÕES GLOBAIS DA PÁGINA
     const managerActions = document.getElementById('managerActions');
     if (managerActions && user.isManager) {
         managerActions.style.display = 'block';
     }
 
-    // CARREGAMENTO DE DADOS (Consome a Feature)
-    await renderTasks();
+    await renderTasks(user.isManager);
 
-    // LOGOUT
     document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
         e.preventDefault();
         localStorage.removeItem('@Leve:token');
         localStorage.removeItem('@Leve:user');
-        window.location.href = '../../login/ui/index.html';
+        window.location.href = '../login/index.html';
     });
 });
 
-async function renderTasks() {
+async function renderTasks(isManager: boolean) {
     const container = document.getElementById('tasksGridContainer');
     if (!container) return;
 
     try {
-        const tasks = await loadMyTasks();
+        const tasks = isManager ? await loadManagedTasks() : await loadMyTasks();
 
         if (tasks.length === 0) {
             container.innerHTML = '<div class="uk-alert-warning" uk-alert><p>Nenhuma tarefa encontrada.</p></div>';
@@ -50,7 +47,7 @@ async function renderTasks() {
             <table class="uk-table uk-table-hover uk-table-divider">
                 <thead>
                     <tr>
-                        <th>Responsável</th>
+                        <th>${isManager ? 'Colaborador' : 'Gestor'}</th>
                         <th>Descrição</th>
                         <th>Prazo</th>
                         <th>Status</th>
@@ -59,15 +56,18 @@ async function renderTasks() {
                 <tbody>
         `;
 
-        tasks.forEach(task => {
-            const date = new Date(task.dueDate).toLocaleDateString('pt-BR');
-            const isPending = task.status === 1; 
+        tasks.forEach((task: Task) => {
+            const date = new Date(task.dueDate).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+            const isPending = task.status === 1;
             const statusClass = isPending ? 'status-pendente' : 'status-concluida';
             const statusText = isPending ? 'Pendente' : 'Concluída';
+            const personName = isManager
+                ? (task.assignee?.fullName ?? '—')
+                : (task.manager?.fullName ?? '—');
 
             html += `
                 <tr>
-                    <td class="uk-text-bold">${task.assignee?.fullName || 'Eu'}</td>
+                    <td class="uk-text-bold">${personName}</td>
                     <td>${task.description}</td>
                     <td>${date}</td>
                     <td><span class="status-badge ${statusClass}">${statusText}</span></td>
@@ -79,7 +79,7 @@ async function renderTasks() {
         container.innerHTML = html;
 
     } catch (error) {
-        console.error("Erro ao renderizar tarefas:", error);
+        console.error('Erro ao renderizar tarefas:', error);
         container.innerHTML = '<div class="uk-alert-danger" uk-alert><p>Erro ao carregar tarefas do servidor.</p></div>';
     }
 }
