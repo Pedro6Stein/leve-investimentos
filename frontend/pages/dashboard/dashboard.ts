@@ -1,5 +1,5 @@
 ﻿declare const UIkit: any;
-import { loadMyTasks, loadManagedTasks, createTask, completeTask, Task } from '../../services/taskService.js';
+import { loadMyTasks, loadManagedTasks, createTask, completeTask, updateTask, Task } from '../../services/taskService.js';
 import { loadUsers, createUser } from '../../services/userService.js';
 import { AuthUser } from '../../services/authService.js';
 import { DataGrid } from '../../shared/components/DataGrid.js';
@@ -22,6 +22,7 @@ if (!token || !userRaw) {
             if (managerActions) managerActions.style.display = 'flex';
             await setupUserModal();
             await setupTaskModal();
+            setupEditTaskModal();
         }
 
         await renderTasks(user.isManager);
@@ -37,23 +38,30 @@ if (!token || !userRaw) {
 async function setupUserModal() {
     const form = document.getElementById('formCadastroUsuario') as HTMLFormElement;
     const btn = document.getElementById('btnSalvarUsuario') as HTMLButtonElement;
+    const photoInput = document.getElementById('newUserPhoto') as HTMLInputElement;
+    const photoPreview = document.getElementById('photoPreview') as HTMLImageElement;
+    const photoPreviewContainer = document.getElementById('photoPreviewContainer') as HTMLElement;
+
+    photoInput.addEventListener('change', () => {
+        if (!photoInput.files?.length) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            photoPreview.src = e.target!.result as string;
+            photoPreviewContainer.style.display = 'block';
+        };
+        reader.readAsDataURL(photoInput.files[0]);
+    });
 
     btn.addEventListener('click', async (e) => {
         e.preventDefault();
-
-        if (!form.checkValidity()) {
-            form.reportValidity();
-            return;
-        }
+        if (!form.checkValidity()) { form.reportValidity(); return; }
 
         const originalText = btn.innerHTML;
         btn.innerHTML = '<div uk-spinner="ratio: 0.5"></div> Cadastrando...';
         btn.disabled = true;
 
         try {
-            const photoInput = document.getElementById('newUserPhoto') as HTMLInputElement;
             let photo: string | undefined;
-
             if (photoInput.files?.length) {
                 photo = await fileToBase64(photoInput.files[0]);
             }
@@ -77,7 +85,9 @@ async function setupUserModal() {
             });
 
             form.reset();
+            photoPreviewContainer.style.display = 'none';
             UIkit.modal('#modal-cadastro-usuario').hide();
+            await renderTasks(true);
 
         } catch (error) {
             const msg = error instanceof HttpError ? error.message : 'Erro interno ao cadastrar.';
@@ -114,8 +124,9 @@ async function setupTaskModal() {
         });
     }
 
-    form.addEventListener('submit', async (e) => {
+    btn.addEventListener('click', async (e) => {
         e.preventDefault();
+        if (!form.checkValidity()) { form.reportValidity(); return; }
 
         const originalText = btn.innerHTML;
         btn.innerHTML = '<div uk-spinner="ratio: 0.5"></div> Criando...';
@@ -150,6 +161,70 @@ async function setupTaskModal() {
             btn.disabled = false;
         }
     });
+}
+
+function setupEditTaskModal() {
+    const btn = document.getElementById('btnSalvarEdicao') as HTMLButtonElement;
+
+    btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+
+        const id          = (document.getElementById('editTaskId')          as HTMLInputElement).value;
+        const assigneeId  = (document.getElementById('editTaskAssignee')    as HTMLSelectElement).value;
+        const description = (document.getElementById('editTaskDescription') as HTMLTextAreaElement).value;
+        const dueDate     = (document.getElementById('editTaskDueDate')     as HTMLInputElement).value;
+
+        if (!assigneeId || !description || !dueDate) {
+            UIkit.notification({
+                message: `<span uk-icon='icon: warning'></span> Preencha todos os campos.`,
+                status: 'warning',
+                pos: 'top-right'
+            });
+            return;
+        }
+
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<div uk-spinner="ratio: 0.5"></div> Salvando...';
+        btn.disabled = true;
+
+        try {
+            await updateTask(id, { assigneeId, description, dueDate });
+
+            UIkit.notification({
+                message: `<span uk-icon='icon: check'></span> Tarefa atualizada com sucesso!`,
+                status: 'success',
+                pos: 'top-right'
+            });
+
+            UIkit.modal('#modal-editar-tarefa').hide();
+            await renderTasks(true);
+
+        } catch (error) {
+            const msg = error instanceof HttpError ? error.message : 'Erro ao salvar alterações.';
+            UIkit.notification({
+                message: `<span uk-icon='icon: warning'></span> ${msg}`,
+                status: 'danger',
+                pos: 'top-right'
+            });
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    });
+}
+
+function openEditModal(task: Task) {
+    const editSelect = document.getElementById('editTaskAssignee') as HTMLSelectElement;
+
+    (document.getElementById('editTaskId')          as HTMLInputElement).value        = task.id;
+    (document.getElementById('editTaskDescription') as HTMLTextAreaElement).value     = task.description;
+    (document.getElementById('editTaskDueDate')     as HTMLInputElement).value        = task.dueDate.substring(0, 10);
+
+    Array.from(editSelect.options).forEach(opt => {
+        opt.selected = opt.value === task.assigneeId;
+    });
+
+    UIkit.modal('#modal-editar-tarefa').show();
 }
 
 async function renderTasks(isManager: boolean) {
@@ -191,6 +266,25 @@ async function renderTasks(isManager: boolean) {
 
         const grid = new DataGrid<Task>('tasksGridContainer', columns);
         grid.render(tasks);
+
+        if (isManager) {
+            container.querySelectorAll<HTMLTableRowElement>('tbody tr').forEach((row, index) => {
+                row.style.cursor = 'pointer';
+                row.title = 'Duplo clique para editar';
+                row.addEventListener('dblclick', () => openEditModal(tasks[index]));
+            });
+
+            const editSelect = document.getElementById('editTaskAssignee') as HTMLSelectElement;
+            if (editSelect.options.length <= 1) {
+                const users = await loadUsers();
+                users.forEach(u => {
+                    const option = document.createElement('option');
+                    option.value = u.id;
+                    option.textContent = u.fullName;
+                    editSelect.appendChild(option);
+                });
+            }
+        }
 
         if (!isManager) {
             container.querySelectorAll<HTMLButtonElement>('.btn-concluir').forEach(btn => {
@@ -234,13 +328,11 @@ function fileToBase64(file: File): Promise<string> {
                 const canvas = document.createElement('canvas');
                 const MAX = 400;
                 let { width, height } = img;
-
                 if (width > height) {
                     if (width > MAX) { height = Math.round(height * MAX / width); width = MAX; }
                 } else {
                     if (height > MAX) { width = Math.round(width * MAX / height); height = MAX; }
                 }
-
                 canvas.width = width;
                 canvas.height = height;
                 canvas.getContext('2d')!.drawImage(img, 0, 0, width, height);
