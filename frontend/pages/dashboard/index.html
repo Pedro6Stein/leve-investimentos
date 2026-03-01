@@ -19,7 +19,7 @@
                 <li>
                     <a href="#">
                         <span uk-icon="icon: user; ratio: 0.9" class="uk-margin-small-right"></span>
-                        <span id="userNameDisplay">A carregar...</span>
+                        <span id="userNameDisplay">Carregando...</span>
                     </a>
                 </li>
                 <li>
@@ -35,12 +35,15 @@
         <div class="uk-flex uk-flex-between uk-flex-middle uk-margin-bottom">
             <div>
                 <h2 class="uk-margin-remove-bottom uk-text-bold">Gestão de Tarefas</h2>
-                <p class="uk-text-meta uk-margin-remove-top">Acompanhe e gira as demandas da equipa.</p>
+                <p class="uk-text-meta uk-margin-remove-top">Acompanhe e gerencie as demandas da equipe.</p>
             </div>
 
             <div id="managerActions" style="display: none;">
                 <button class="uk-button uk-button-primary redondo" uk-toggle="target: #modal-cadastro-usuario">
-                    <span uk-icon="icon: user-add"></span> Cadastrar Utilizador
+                    <span uk-icon="icon: user-add"></span> Cadastrar Usuário
+                </button>
+                <button class="uk-button uk-button-secondary redondo uk-margin-small-left" uk-toggle="target: #modal-nova-tarefa">
+                    <span uk-icon="icon: plus"></span> Nova Tarefa
                 </button>
             </div>
         </div>
@@ -49,16 +52,18 @@
             <div class="uk-card-body uk-padding-small" id="tasksGridContainer">
                 <div class="uk-text-center uk-padding">
                     <div uk-spinner></div>
-                    <p>A carregar tarefas...</p>
+                    <p>Carregando tarefas...</p>
                 </div>
             </div>
         </div>
     </div>
 
     <div id="modal-cadastro-usuario" uk-modal></div>
+    <div id="modal-nova-tarefa" uk-modal></div>
 
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.17.11/dist/js/uikit.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.17.11/dist/js/uikit-icons.min.js"></script>
+    
     <script type="module" src="../../dist/pages/dashboard/dashboard.js"></script>
 </body>
 </html>

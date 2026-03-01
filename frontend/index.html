@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>LEVE Ops - Redirecionando...</title>
+</head>
+<body style="background: #0f172a;">
+    <script>
+        const token = localStorage.getItem('@Leve:token');
+        const target = token ? "/pages/dashboard/index.html" : "/pages/login/index.html";
+        window.location.replace(target);
+    </script>
+</body>
+</html>

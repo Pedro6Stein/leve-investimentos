@@ -1,0 +1,100 @@
+﻿declare const UIkit: any;
+import { loadMyTasks, loadManagedTasks, Task } from '../../services/taskService.js';
+import { AuthUser } from '../../services/authService.js';
+
+const token = localStorage.getItem('@Leve:token');
+const userRaw = localStorage.getItem('@Leve:user');
+
+if (!token || !userRaw) {
+    window.location.href = '/pages/login/index.html';
+}
+
+const user: AuthUser = JSON.parse(userRaw!);
+
+document.addEventListener('DOMContentLoaded', async () => {
+    initUI();
+    setupEventListeners();
+    await renderTasks(user.isManager);
+});
+
+function initUI(): void {
+    const userNameDisplay = document.getElementById('userNameDisplay');
+    if (userNameDisplay) userNameDisplay.innerText = user.fullName;
+
+    const managerActions = document.getElementById('managerActions');
+    if (managerActions && user.isManager) {
+        managerActions.style.display = 'block';
+    }
+}
+
+function setupEventListeners(): void {
+    document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('@Leve:token');
+        localStorage.removeItem('@Leve:user');
+        window.location.href = '../../login/index.html';
+    });
+}
+
+async function renderTasks(isManager: boolean): Promise<void> {
+    const container = document.getElementById('tasksGridContainer');
+    if (!container) return;
+
+    try {
+        const tasks = isManager ? await loadManagedTasks() : await loadMyTasks();
+
+        if (tasks.length === 0) {
+            container.innerHTML = `
+                <div class="uk-alert-warning" uk-alert>
+                    <p>Nenhuma tarefa encontrada.</p>
+                </div>`;
+            return;
+        }
+
+        container.innerHTML = generateTableHtml(tasks, isManager);
+    } catch (error) {
+        console.error('Render error:', error);
+        container.innerHTML = `
+            <div class="uk-alert-danger" uk-alert>
+                <p>Erro ao carregar tarefas do servidor.</p>
+            </div>`;
+    }
+}
+
+function generateTableHtml(tasks: Task[], isManager: boolean): string {
+    const tableHeader = `
+        <table class="uk-table uk-table-hover uk-table-divider">
+            <thead>
+                <tr>
+                    <th>${isManager ? 'Colaborador' : 'Gestor'}</th>
+                    <th>Descrição</th>
+                    <th>Prazo</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${tasks.map(task => createTaskRow(task, isManager)).join('')}
+            </tbody>
+        </table>`;
+    
+    return tableHeader;
+}
+
+function createTaskRow(task: Task, isManager: boolean): string {
+    const date = new Date(task.dueDate).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
+    const isPending = task.status === 1;
+    const statusClass = isPending ? 'status-pendente' : 'status-concluida';
+    const statusText = isPending ? 'Pendente' : 'Concluída';
+    
+    const personName = isManager
+        ? (task.assignee?.fullName ?? '—') 
+        : (task.manager?.fullName ?? '—');
+
+    return `
+        <tr>
+            <td class="uk-text-bold">${personName}</td>
+            <td>${task.description}</td>
+            <td>${date}</td>
+            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+        </tr>`;
+}
