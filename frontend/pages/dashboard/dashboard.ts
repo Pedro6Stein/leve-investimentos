@@ -1,6 +1,7 @@
 ﻿declare const UIkit: any;
 import { loadMyTasks, loadManagedTasks, Task } from '../../services/taskService.js';
 import { AuthUser } from '../../services/authService.js';
+import { DataGrid } from '../../shared/components/DataGrid.js';
 
 const token = localStorage.getItem('@Leve:token');
 const userRaw = localStorage.getItem('@Leve:user');
@@ -36,45 +37,33 @@ async function renderTasks(isManager: boolean) {
     try {
         const tasks = isManager ? await loadManagedTasks() : await loadMyTasks();
 
-        if (tasks.length === 0) {
-            container.innerHTML = '<div class="uk-alert-warning" uk-alert><p>Nenhuma tarefa encontrada.</p></div>';
-            return;
-        }
+        const grid = new DataGrid<Task>('tasksGridContainer', [
+            {
+                header: isManager ? 'Colaborador' : 'Gestor',
+                key: isManager ? 'assignee.fullName' : 'manager.fullName'
+            },
+            { 
+                header: 'Descrição', 
+                key: 'description' 
+            },
+            {
+                header: 'Prazo',
+                key: 'dueDate',
+                render: (task) => new Date(task.dueDate).toLocaleDateString('pt-BR', { timeZone: 'UTC' })
+            },
+            {
+                header: 'Status',
+                key: 'status',
+                render: (task) => {
+                    const isPending = task.status === 1;
+                    const statusClass = isPending ? 'status-pendente' : 'status-concluida';
+                    const statusText = isPending ? 'Pendente' : 'Concluída';
+                    return `<span class="status-badge ${statusClass}">${statusText}</span>`;
+                }
+            }
+        ]);
 
-        let html = `
-            <table class="uk-table uk-table-hover uk-table-divider">
-                <thead>
-                    <tr>
-                        <th>${isManager ? 'Colaborador' : 'Gestor'}</th>
-                        <th>Descrição</th>
-                        <th>Prazo</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-        `;
-
-        tasks.forEach((task: Task) => {
-            const date = new Date(task.dueDate).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
-            const isPending = task.status === 1;
-            const statusClass = isPending ? 'status-pendente' : 'status-concluida';
-            const statusText = isPending ? 'Pendente' : 'Concluída';
-            const personName = isManager
-                ? (task.assignee?.fullName ?? '—')
-                : (task.manager?.fullName ?? '—');
-
-            html += `
-                <tr>
-                    <td class="uk-text-bold">${personName}</td>
-                    <td>${task.description}</td>
-                    <td>${date}</td>
-                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                </tr>
-            `;
-        });
-
-        html += '</tbody></table>';
-        container.innerHTML = html;
+        grid.render(tasks);
 
     } catch (error) {
         container.innerHTML = '<div class="uk-alert-danger" uk-alert><p>Erro ao carregar tarefas do servidor.</p></div>';
