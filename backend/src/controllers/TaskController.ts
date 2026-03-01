@@ -132,4 +132,45 @@ export class TaskController {
             res.status(500).json({ error: 'Erro ao concluir tarefa.' });
         }
     };
+
+    //adicionado encima da hora como perfumaria --> o user com dois clicks consegue editar
+    update = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+        try {
+            const id = String(req.params.id);
+
+            const taskInfo = await prisma.task.findUnique({
+                where: { id },
+                include: { assignee: true, manager: true }
+            });
+
+            if (!taskInfo) {
+                res.status(404).json({ error: 'Tarefa não encontrada.' });
+                return;
+            }
+
+            const { description, dueDate, assigneeId } = req.body;
+
+            const updatedTask = await prisma.task.update({
+                where: { id },
+                data: {
+                    description: description ?? taskInfo.description,
+                    dueDate: dueDate ? new Date(dueDate) : taskInfo.dueDate,
+                    assigneeId: assigneeId ?? taskInfo.assigneeId,
+                }
+            });
+
+            const newAssignee = await prisma.user.findUnique({ where: { id: updatedTask.assigneeId } });
+            const managerEmail = req.user?.email;
+
+            if (newAssignee && managerEmail) {
+                emailService.sendTaskAssignedEmail(newAssignee.email, managerEmail, newAssignee.fullName, updatedTask.description);
+            }
+
+            res.status(200).json(updatedTask);
+
+        } catch (error) {
+            console.error('ERRO AO EDITAR TAREFA:', error);
+            res.status(500).json({ error: 'Erro ao editar tarefa.' });
+        }
+    };
 }

@@ -15,8 +15,9 @@ export interface CreateUserData {
     landline?: string;
     mobile: string;
     email: string;
-    password?: string; 
+    password: string;
     address: string;
+    photo?: string;
     isManager?: boolean;
 }
 

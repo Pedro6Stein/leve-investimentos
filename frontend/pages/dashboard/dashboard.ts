@@ -1,8 +1,8 @@
 ﻿declare const UIkit: any;
-import { loadMyTasks, loadManagedTasks, Task } from '../../services/taskService.js';
+import { loadMyTasks, loadManagedTasks, createTask, completeTask, Task } from '../../services/taskService.js';
+import { loadUsers, createUser } from '../../services/userService.js';
 import { AuthUser } from '../../services/authService.js';
 import { DataGrid } from '../../shared/components/DataGrid.js';
-import { createUser } from '../../services/userService.js';
 import { HttpError } from '../../services/httpClient.js';
 
 const token = localStorage.getItem('@Leve:token');
@@ -17,10 +17,11 @@ if (!token || !userRaw) {
         const userNameDisplay = document.getElementById('userNameDisplay');
         if (userNameDisplay) userNameDisplay.innerText = user.fullName;
 
-        const managerActions = document.getElementById('managerActions');
-        if (managerActions && user.isManager) {
-            managerActions.style.display = 'block';
-            setupManagerActions();
+        if (user.isManager) {
+            const managerActions = document.getElementById('managerActions');
+            if (managerActions) managerActions.style.display = 'flex';
+            await setupUserModal();
+            await setupTaskModal();
         }
 
         await renderTasks(user.isManager);
@@ -33,87 +34,134 @@ if (!token || !userRaw) {
     });
 }
 
-function setupManagerActions() {
-    const formCadastro = document.getElementById('formCadastroUsuario') as HTMLFormElement;
-    const btnSalvar = document.getElementById('btnSalvarUsuario') as HTMLButtonElement;
+async function setupUserModal() {
+    const form = document.getElementById('formCadastroUsuario') as HTMLFormElement;
+    const btn = document.getElementById('btnSalvarUsuario') as HTMLButtonElement;
 
-    if (formCadastro) {
-        formCadastro.addEventListener('submit', async (e) => {
-            e.preventDefault();
+    btn.addEventListener('click', async (e) => {
+        e.preventDefault();
 
-            const originalText = btnSalvar.innerHTML;
-            btnSalvar.innerHTML = '<div uk-spinner="ratio: 0.5"></div> Cadastrando...';
-            btnSalvar.disabled = true;
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
 
-            try {
-                const fullName = (document.getElementById('newUserName') as HTMLInputElement).value;
-                const email = (document.getElementById('newUserEmail') as HTMLInputElement).value;
-                const password = (document.getElementById('newUserPassword') as HTMLInputElement).value;
-                const birthDate = (document.getElementById('newUserBirthDate') as HTMLInputElement).value;
-                const mobile = (document.getElementById('newUserMobile') as HTMLInputElement).value;
-                const address = (document.getElementById('newUserAddress') as HTMLInputElement).value;
-                const isManager = (document.getElementById('newUserIsManager') as HTMLInputElement).checked;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<div uk-spinner="ratio: 0.5"></div> Cadastrando...';
+        btn.disabled = true;
 
-                // landline e photo são opcionais no Zod, então podemos enviá-los apenas se existirem no futuro
-                await createUser({
-                    fullName, email, password, birthDate, mobile, address, isManager
-                });
+        try {
+            const photoInput = document.getElementById('newUserPhoto') as HTMLInputElement;
+            let photo: string | undefined;
 
-                UIkit.notification({
-                    message: `<span uk-icon='icon: check'></span> Usuário cadastrado com sucesso!`,
-                    status: 'success',
-                    pos: 'top-right'
-                });
-
-                formCadastro.reset();
-                UIkit.modal('#modal-cadastro-usuario').hide();
-
-            } catch (error) {
-                if (error instanceof HttpError) {
-                    // Tratamento das mensagens bonitinhas do Zod
-                    if (error.details) {
-                        for (const key in error.details) {
-                            if (key !== '_errors' && error.details[key]._errors) {
-                                error.details[key]._errors.forEach((msg: string) => {
-                                    UIkit.notification({
-                                        message: `<span uk-icon='icon: warning'></span> ${msg}`,
-                                        status: 'danger',
-                                        pos: 'top-right'
-                                    });
-                                });
-                            }
-                        }
-                    } else {
-                        // Erros genéricos do backend (ex: E-mail já cadastrado)
-                        UIkit.notification({
-                            message: `<span uk-icon='icon: warning'></span> ${error.message}`,
-                            status: 'danger',
-                            pos: 'top-right'
-                        });
-                    }
-                } else {
-                    UIkit.notification({
-                        message: `<span uk-icon='icon: warning'></span> Erro interno ao cadastrar.`,
-                        status: 'danger',
-                        pos: 'top-right'
-                    });
-                }
-            } finally {
-                btnSalvar.innerHTML = originalText;
-                btnSalvar.disabled = false;
+            if (photoInput.files?.length) {
+                photo = await fileToBase64(photoInput.files[0]);
             }
+
+            await createUser({
+                fullName:  (document.getElementById('newUserName')      as HTMLInputElement).value,
+                email:     (document.getElementById('newUserEmail')     as HTMLInputElement).value,
+                password:  (document.getElementById('newUserPassword')  as HTMLInputElement).value,
+                birthDate: (document.getElementById('newUserBirthDate') as HTMLInputElement).value,
+                mobile:    (document.getElementById('newUserMobile')    as HTMLInputElement).value,
+                landline:  (document.getElementById('newUserLandline')  as HTMLInputElement).value || undefined,
+                address:   (document.getElementById('newUserAddress')   as HTMLInputElement).value,
+                isManager: (document.getElementById('newUserIsManager') as HTMLInputElement).checked,
+                photo,
+            });
+
+            UIkit.notification({
+                message: `<span uk-icon='icon: check'></span> Usuário cadastrado com sucesso!`,
+                status: 'success',
+                pos: 'top-right'
+            });
+
+            form.reset();
+            UIkit.modal('#modal-cadastro-usuario').hide();
+
+        } catch (error) {
+            const msg = error instanceof HttpError ? error.message : 'Erro interno ao cadastrar.';
+            UIkit.notification({
+                message: `<span uk-icon='icon: warning'></span> ${msg}`,
+                status: 'danger',
+                pos: 'top-right'
+            });
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    });
+}
+
+async function setupTaskModal() {
+    const select = document.getElementById('newTaskAssignee') as HTMLSelectElement;
+    const form = document.getElementById('formNovaTarefa') as HTMLFormElement;
+    const btn = document.getElementById('btnSalvarTarefa') as HTMLButtonElement;
+
+    try {
+        const users = await loadUsers();
+        users.forEach(u => {
+            const option = document.createElement('option');
+            option.value = u.id;
+            option.textContent = u.fullName;
+            select.appendChild(option);
+        });
+    } catch {
+        UIkit.notification({
+            message: `<span uk-icon='icon: warning'></span> Erro ao carregar colaboradores.`,
+            status: 'danger',
+            pos: 'top-right'
         });
     }
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<div uk-spinner="ratio: 0.5"></div> Criando...';
+        btn.disabled = true;
+
+        try {
+            await createTask({
+                assigneeId:  (document.getElementById('newTaskAssignee')    as HTMLSelectElement).value,
+                description: (document.getElementById('newTaskDescription') as HTMLTextAreaElement).value,
+                dueDate:     (document.getElementById('newTaskDueDate')     as HTMLInputElement).value,
+            });
+
+            UIkit.notification({
+                message: `<span uk-icon='icon: check'></span> Tarefa criada com sucesso!`,
+                status: 'success',
+                pos: 'top-right'
+            });
+
+            form.reset();
+            UIkit.modal('#modal-nova-tarefa').hide();
+            await renderTasks(true);
+
+        } catch (error) {
+            const msg = error instanceof HttpError ? error.message : 'Erro interno ao criar tarefa.';
+            UIkit.notification({
+                message: `<span uk-icon='icon: warning'></span> ${msg}`,
+                status: 'danger',
+                pos: 'top-right'
+            });
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    });
 }
 
 async function renderTasks(isManager: boolean) {
     const container = document.getElementById('tasksGridContainer');
     if (!container) return;
 
+    container.innerHTML = `<div class="uk-text-center uk-padding"><div uk-spinner></div></div>`;
+
     try {
         const tasks = isManager ? await loadManagedTasks() : await loadMyTasks();
 
-        const grid = new DataGrid<Task>('tasksGridContainer', [
+        const columns = [
             {
                 header: isManager ? 'Colaborador' : 'Gestor',
                 key: isManager ? 'assignee.fullName' : 'manager.fullName'
@@ -122,23 +170,84 @@ async function renderTasks(isManager: boolean) {
             {
                 header: 'Prazo',
                 key: 'dueDate',
-                render: (task) => new Date(task.dueDate).toLocaleDateString('pt-BR', { timeZone: 'UTC' })
+                render: (task: Task) => new Date(task.dueDate).toLocaleDateString('pt-BR', { timeZone: 'UTC' })
             },
             {
                 header: 'Status',
                 key: 'status',
-                render: (task) => {
+                render: (task: Task) => {
                     const isPending = task.status === 1;
-                    const statusClass = isPending ? 'status-pendente' : 'status-concluida';
-                    const statusText = isPending ? 'Pendente' : 'Concluída';
-                    return `<span class="status-badge ${statusClass}">${statusText}</span>`;
+                    return `<span class="status-badge ${isPending ? 'status-pendente' : 'status-concluida'}">${isPending ? 'Pendente' : 'Concluída'}</span>`;
                 }
-            }
-        ]);
+            },
+            ...(!isManager ? [{
+                header: 'Ação',
+                key: 'id',
+                render: (task: Task) => task.status === 1
+                    ? `<button class="uk-button uk-button-primary uk-button-small redondo btn-concluir" data-id="${task.id}">Concluir</button>`
+                    : '—'
+            }] : [])
+        ];
 
+        const grid = new DataGrid<Task>('tasksGridContainer', columns);
         grid.render(tasks);
 
-    } catch (error) {
+        if (!isManager) {
+            container.querySelectorAll<HTMLButtonElement>('.btn-concluir').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    btn.disabled = true;
+                    btn.innerHTML = '<div uk-spinner="ratio: 0.4"></div>';
+                    try {
+                        await completeTask(btn.dataset.id!);
+                        UIkit.notification({
+                            message: `<span uk-icon='icon: check'></span> Tarefa concluída!`,
+                            status: 'success',
+                            pos: 'top-right'
+                        });
+                        await renderTasks(false);
+                    } catch {
+                        UIkit.notification({
+                            message: `<span uk-icon='icon: warning'></span> Erro ao concluir tarefa.`,
+                            status: 'danger',
+                            pos: 'top-right'
+                        });
+                        btn.disabled = false;
+                        btn.innerHTML = 'Concluir';
+                    }
+                });
+            });
+        }
+
+    } catch {
         container.innerHTML = '<div class="uk-alert-danger" uk-alert><p>Erro ao carregar tarefas do servidor.</p></div>';
     }
+}
+
+function fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error('Erro ao ler o arquivo.'));
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onerror = () => reject(new Error('Erro ao processar imagem.'));
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const MAX = 400;
+                let { width, height } = img;
+
+                if (width > height) {
+                    if (width > MAX) { height = Math.round(height * MAX / width); width = MAX; }
+                } else {
+                    if (height > MAX) { width = Math.round(width * MAX / height); height = MAX; }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                canvas.getContext('2d')!.drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL('image/jpeg', 0.7));
+            };
+            img.src = e.target!.result as string;
+        };
+        reader.readAsDataURL(file);
+    });
 }

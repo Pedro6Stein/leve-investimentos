@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,8 +9,9 @@
     <link rel="stylesheet" href="/shared/global.css">
     <link rel="stylesheet" href="/pages/dashboard/dashboard.css">
 </head>
+
 <body class="bg-cinza">
-    <nav class="uk-navbar-container uk-background-primary uk-light" uk-navbar>
+    <nav class="uk-navbar-container" uk-navbar>
         <div class="uk-navbar-left">
             <a class="uk-navbar-item uk-logo uk-text-bold" href="#">LEVE Ops</a>
         </div>
@@ -41,7 +43,8 @@
                 <button class="uk-button uk-button-primary redondo" uk-toggle="target: #modal-cadastro-usuario">
                     <span uk-icon="icon: user-add"></span> Cadastrar Usuário
                 </button>
-                <button class="uk-button uk-button-secondary redondo uk-margin-small-left" uk-toggle="target: #modal-nova-tarefa">
+                <button class="uk-button uk-button-secondary redondo uk-margin-small-left"
+                    uk-toggle="target: #modal-nova-tarefa">
                     <span uk-icon="icon: plus"></span> Nova Tarefa
                 </button>
             </div>
@@ -62,45 +65,86 @@
             <h2 class="uk-modal-title uk-text-bold">Novo Colaborador</h2>
             <form id="formCadastroUsuario" action="javascript:void(0);">
                 <div class="uk-margin">
-                    <input id="newUserName" class="uk-input redondo" type="text" placeholder="Nome Completo" required minlength="3" maxlength="150">
+                    <input id="newUserName" class="uk-input redondo" type="text" placeholder="Nome Completo" required
+                        minlength="3" maxlength="150">
                 </div>
                 <div class="uk-grid-small" uk-grid>
                     <div class="uk-width-1-2@s">
-                        <input id="newUserEmail" class="uk-input redondo" type="email" placeholder="E-mail corporativo" required maxlength="100">
+                        <input id="newUserEmail" class="uk-input redondo" type="email" placeholder="E-mail corporativo"
+                            required maxlength="100">
                     </div>
                     <div class="uk-width-1-2@s">
-                        <input id="newUserPassword" class="uk-input redondo" type="password" placeholder="Senha Inicial" required minlength="6" maxlength="255">
+                        <input id="newUserPassword" class="uk-input redondo" type="password" placeholder="Senha Inicial"
+                            required minlength="6" maxlength="255">
                     </div>
                 </div>
                 <div class="uk-grid-small uk-margin-top" uk-grid>
                     <div class="uk-width-1-3@s">
-                        <input id="newUserBirthDate" class="uk-input redondo" type="date" required title="Data de Nascimento">
+                        <input id="newUserBirthDate" class="uk-input redondo" type="date" required
+                            title="Data de Nascimento">
                     </div>
                     <div class="uk-width-1-3@s">
-                        <input id="newUserMobile" class="uk-input redondo" type="text" placeholder="Celular (Mín 9 dig.)" required minlength="9" maxlength="20">
+                        <input id="newUserMobile" class="uk-input redondo" type="text"
+                            placeholder="Celular (Mín 9 dig.)" required minlength="9" maxlength="20">
                     </div>
                     <div class="uk-width-1-3@s">
-                        <input id="newUserLandline" class="uk-input redondo" type="text" placeholder="Tel. Fixo (Opcional)" maxlength="20">
+                        <input id="newUserLandline" class="uk-input redondo" type="text"
+                            placeholder="Tel. Fixo (Opcional)" maxlength="20">
                     </div>
                 </div>
                 <div class="uk-margin">
-                    <input id="newUserAddress" class="uk-input redondo" type="text" placeholder="Endereço Completo" required minlength="5" maxlength="255">
+                    <input id="newUserAddress" class="uk-input redondo" type="text" placeholder="Endereço Completo"
+                        required minlength="5" maxlength="255">
+                </div>
+                <div class="uk-margin">
+                    <div uk-form-custom="target: #newUserPhotoLabel">
+                        <input id="newUserPhoto" type="file" accept="image/*">
+                        <input id="newUserPhotoLabel" class="uk-input redondo" type="text"
+                            placeholder="Foto do colaborador (Opcional)" readonly>
+                    </div>
                 </div>
                 <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-                    <label><input id="newUserIsManager" class="uk-checkbox" type="checkbox"> Conceder permissões de Gestor</label>
+                    <label><input id="newUserIsManager" class="uk-checkbox" type="checkbox"> Conceder permissões de
+                        Gestor</label>
                 </div>
                 <div class="uk-margin-top uk-text-right">
                     <button class="uk-button uk-button-default uk-modal-close redondo" type="button">Cancelar</button>
-                    <button id="btnSalvarUsuario" class="uk-button uk-button-primary redondo" type="submit">Cadastrar</button>
+                    <button id="btnSalvarUsuario" class="uk-button uk-button-primary redondo"
+                        type="submit">Cadastrar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="modal-nova-tarefa" uk-modal></div>
+    <div id="modal-nova-tarefa" uk-modal>
+        <div class="uk-modal-dialog uk-modal-body uk-card-default redondo">
+            <button class="uk-modal-close-default" type="button" uk-close></button>
+            <h2 class="uk-modal-title uk-text-bold">Nova Tarefa</h2>
+            <form id="formNovaTarefa" action="javascript:void(0);">
+                <div class="uk-margin">
+                    <select id="newTaskAssignee" class="uk-select redondo" required>
+                        <option value="">Selecione o colaborador...</option>
+                    </select>
+                </div>
+                <div class="uk-margin">
+                    <textarea id="newTaskDescription" class="uk-textarea redondo" rows="3"
+                        placeholder="Descrição da tarefa (mín. 5 caracteres)" required minlength="5"></textarea>
+                </div>
+                <div class="uk-margin">
+                    <input id="newTaskDueDate" class="uk-input redondo" type="date" required title="Data Limite">
+                </div>
+                <div class="uk-margin-top uk-text-right">
+                    <button class="uk-button uk-button-default uk-modal-close redondo" type="button">Cancelar</button>
+                    <button id="btnSalvarTarefa" class="uk-button uk-button-primary redondo" type="submit">Criar
+                        Tarefa</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.17.11/dist/js/uikit.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.17.11/dist/js/uikit-icons.min.js"></script>
     <script type="module" src="/dist/pages/dashboard/dashboard.js"></script>
 </body>
+
 </html>
