@@ -47,5 +47,5 @@ export async function completeTask(taskId: string): Promise<Task> {
 }
 
 export async function updateTask(taskId: string, data: UpdateTaskData): Promise<Task> {
-    return api.patch<Task>(`/tasks/${taskId}`, data);
+    return api.put<Task>(`/tasks/${taskId}`, data);
 }

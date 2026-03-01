@@ -74,6 +74,10 @@ export class HttpClient {
     public patch<T>(endpoint: string, body?: unknown, options?: HttpRequestOptions): Promise<T> {
         return this.request<T>(endpoint, { ...options, method: 'PATCH', body: body ? JSON.stringify(body) : undefined });
     }
+
+    public put<T>(endpoint: string, body?: unknown, options?: HttpRequestOptions): Promise<T> {
+    return this.request<T>(endpoint, { ...options, method: 'PUT', body: body ? JSON.stringify(body) : undefined });
+}
 }
 
 // Custom Error para tipagem forte de exceções HTTP
