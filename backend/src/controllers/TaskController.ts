@@ -2,20 +2,31 @@ import { Response } from 'express';
 import { prisma } from '../utils/prisma';
 import { AuthenticatedRequest } from '../middlewares/authMiddleware';
 import { EmailService } from '../services/EmailService';
+import { z } from 'zod';
 
 const emailService = new EmailService();
+const createTaskSchema = z.object({
+    assigneeId: z.string().min(1, 'O ID do subordinado é obrigatório.'),
+    description: z.string().min(5, 'A descrição deve ter pelo menos 5 caracteres.'),
+    dueDate: z.string().refine((date) => !isNaN(Date.parse(date)), 'Data limite inválida.'),
+});
 
 export class TaskController {
     // cria task
-  create = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    create = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
         try {
-            const { assigneeId, description, dueDate } = req.body;
-            const managerId = req.user?.userId;
+            const validation = createTaskSchema.safeParse(req.body);
 
-            if (!assigneeId || !description || !dueDate) {
-                res.status(400).json({ error: 'Dados da tarefa incompletos.' });
+            if (!validation.success) {
+                res.status(400).json({
+                    error: 'Dados da tarefa inválidos',
+                    details: validation.error.format()
+                });
                 return;
             }
+
+            const { assigneeId, description, dueDate } = validation.data;
+            const managerId = req.user?.userId;
 
             const task = await prisma.task.create({
                 data: {
@@ -40,6 +51,7 @@ export class TaskController {
             res.status(201).json(task);
 
         } catch (error) {
+            console.error("ERRO AO CRIAR TAREFA:", error);
             res.status(500).json({ error: 'Erro ao criar tarefa.' });
         }
     };
@@ -73,7 +85,7 @@ export class TaskController {
             res.status(500).json({ error: 'Erro ao listar tarefas da equipa.' });
         }
     };
-    
+
     // Se task completada ---> muda a data, coloca um "check" e AVISA O GESTOR
     complete = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
         try {

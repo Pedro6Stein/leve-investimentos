@@ -1,6 +1,19 @@
 import { Request, Response } from 'express';
 import { prisma } from '../utils/prisma';
 import bcrypt from 'bcrypt';
+import { z } from 'zod';
+
+const createUserSchema = z.object({
+    fullName: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres.'),
+    birthDate: z.string().refine((date) => !isNaN(Date.parse(date)), 'Data de nascimento inválida.'),
+    landline: z.string().optional(),
+    mobile: z.string().min(9, 'O telemóvel/celular deve ter pelo menos 9 dígitos.'),
+    email: z.string().email('Formato de e-mail inválido.'),
+    password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres.'),
+    address: z.string().min(5, 'O endereço é obrigatório e deve ser válido.'),
+    photo: z.string().optional(),
+    isManager: z.boolean().optional().default(false),
+});
 
 export class UserController {
     listAll = async (req: Request, res: Response): Promise<void> => {
@@ -21,20 +34,21 @@ export class UserController {
             res.status(500).json({ error: 'Erro interno ao buscar usuários.' });
         }
     };
-
     create = async (req: Request, res: Response): Promise<void> => {
         try {
-            const { fullName, birthDate, landline, mobile, email, password, address, photo, isManager } = req.body;
-            // Verifica se algum campo obrigatório veio vazio, nulo ou indefinido
-            if (!fullName || !birthDate || !mobile || !email || !password || !address) {
+            const validation = createUserSchema.safeParse(req.body);
+            if (!validation.success) {
                 res.status(400).json({ 
-                    error: 'Campos obrigatórios ausentes. Certifique-se de enviar: fullName, birthDate, mobile, email, password e address.' 
+                    error: 'Dados de cadastro inválidos', 
+                    details: validation.error.format() 
                 });
                 return;
             }
+            const { fullName, birthDate, landline, mobile, email, password, address, photo, isManager } = validation.data;
 
-            //const bcrypt = require('bcrypt');
+            // Criptografa a senha e salva no banco
             const passwordHash = await bcrypt.hash(password, 10);
+            
             const newUser = await prisma.user.create({
                 data: {
                     fullName,
@@ -45,7 +59,7 @@ export class UserController {
                     passwordHash,
                     address,
                     photo,
-                    isManager: isManager || false,
+                    isManager, // O Zod já aplica o default(false) se não for enviado
                 },
                 select: { 
                     id: true, 
@@ -64,7 +78,6 @@ export class UserController {
                 res.status(400).json({ error: 'Este e-mail já está cadastrado.' });
                 return;
             }
-            // Correção do erro de copy-paste no log
             console.error("ERRO REAL NA CRIAÇÃO DO USUÁRIO:", error);
             res.status(500).json({ error: 'Erro interno ao criar utilizador.' });
         }
