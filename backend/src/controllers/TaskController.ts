@@ -163,7 +163,7 @@ export class TaskController {
             const managerEmail = req.user?.email;
 
             if (newAssignee && managerEmail) {
-                emailService.sendTaskAssignedEmail(newAssignee.email, managerEmail, newAssignee.fullName, updatedTask.description);
+                emailService.sendTaskUpdatedEmail(newAssignee.email, managerEmail, newAssignee.fullName, updatedTask.description);
             }
 
             res.status(200).json(updatedTask);

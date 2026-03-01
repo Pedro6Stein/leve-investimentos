@@ -43,4 +43,19 @@ export class EmailService {
             console.error("Erro ao enviar e-mail de tarefa concluída:", error);
         }
     }
+
+    async sendTaskUpdatedEmail(to: string, cc: string, subordinateName: string, description: string) {
+        try {
+            await this.transporter.sendMail({
+                from: `"LEVE Investimentos" <${process.env.EMAIL_USER}>`,
+                to,
+                cc,
+                subject: 'LEVE - Tarefa Atualizada',
+                text: `Olá ${subordinateName},\n\nUma tarefa atribuída a você foi atualizada:\n\n"${description}"\n\nAcesse o sistema para mais detalhes.`,
+            });
+            console.log(`📧 E-mail de Tarefa Atualizada enviado para: ${to} (CC: ${cc})`);
+        } catch (error) {
+            console.error("Erro ao enviar e-mail de tarefa atualizada:", error);
+        }
+    }
 }
