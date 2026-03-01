@@ -1,6 +1,6 @@
 ﻿declare const UIkit: any;
-import { loadMyTasks, loadManagedTasks, Task } from '../../services/taskService.js';
-import { AuthUser } from '../../services/authService.js';
+import { loadMyTasks, loadManagedTasks, Task } from 'services/taskService.js';
+import { AuthUser } from 'services/authService.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('@Leve:token');
