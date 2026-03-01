@@ -1,1 +1,28 @@
-/* //s */
+/* Fundo ultra escuro para salvar as retinas */
+body {
+    background-color: #0f172a !important; /* Azul meia-noite */
+    background-image: radial-gradient(at 0% 0%, rgba(30, 41, 59, 1) 0, transparent 50%), 
+                      radial-gradient(at 50% 0%, rgba(15, 23, 42, 1) 0, transparent 50%) !important;
+}
+
+.redondo {
+    border-radius: 8px !important;
+}
+
+/* Inputs Estilizados para Dark Mode */
+.uk-input {
+    background: #1e293b !important;
+    border: 1px solid #334155 !important;
+    color: #38bdf8 !important;
+    height: 48px;
+}
+
+.uk-input:focus {
+    border-color: #38bdf8 !important; /* Azul neon ao focar */
+}
+
+.uk-card-default {
+    background: #1e293b !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #e2e8f0 !important;
+}

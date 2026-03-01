@@ -17,3 +17,24 @@ export interface AuthUserDTO {
     email: string;
     isManager: boolean;
 }
+
+export interface CreateUserDTO {
+    fullName: string;
+    birthDate: string;      // "YYYY-MM-DD"
+    landline?: string;
+    mobile: string;
+    email: string;
+    password: string;
+    address: string;
+    photo?: string;         // base64
+    isManager?: boolean;
+}
+
+export interface CreatedUserDTO {
+    id: string;
+    fullName: string;
+    email: string;
+    mobile: string;
+    landline?: string | null;
+    address: string;
+}
