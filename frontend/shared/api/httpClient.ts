@@ -78,7 +78,11 @@ export class HttpClient {
 
 // Custom Error para tipagem forte de exceções HTTP
 export class HttpError extends Error {
-    constructor(public status: number, public message: string, public details?: any) {
+    constructor(
+        public status: number, 
+        public message: string, 
+        public details?: any
+    ) {
         super(message);
         this.name = 'HttpError';
     }
