@@ -56,7 +56,44 @@
         </div>
     </div>
 
-    <div id="modal-cadastro-usuario" uk-modal></div>
+    <div id="modal-cadastro-usuario" uk-modal>
+        <div class="uk-modal-dialog uk-modal-body uk-card-default redondo">
+            <button class="uk-modal-close-default" type="button" uk-close></button>
+            <h2 class="uk-modal-title uk-text-center">Novo Colaborador</h2>
+            <form id="formCadastroUsuario" action="javascript:void(0);">
+                <div class="uk-margin">
+                    <input id="newUserName" class="uk-input redondo" type="text" placeholder="Nome Completo" required minlength="3">
+                </div>
+                <div class="uk-grid-small" uk-grid>
+                    <div class="uk-width-1-2@s">
+                        <input id="newUserEmail" class="uk-input redondo" type="email" placeholder="E-mail corporativo" required>
+                    </div>
+                    <div class="uk-width-1-2@s">
+                        <input id="newUserPassword" class="uk-input redondo" type="password" placeholder="Senha Inicial" required minlength="6">
+                    </div>
+                </div>
+                <div class="uk-grid-small uk-margin-top" uk-grid>
+                    <div class="uk-width-1-2@s">
+                        <input id="newUserBirthDate" class="uk-input redondo" type="date" required title="Data de Nascimento">
+                    </div>
+                    <div class="uk-width-1-2@s">
+                        <input id="newUserMobile" class="uk-input redondo" type="text" placeholder="Celular/Telemóvel" required minlength="9">
+                    </div>
+                </div>
+                <div class="uk-margin">
+                    <input id="newUserAddress" class="uk-input redondo" type="text" placeholder="Endereço Completo" required minlength="5">
+                </div>
+                <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+                    <label><input id="newUserIsManager" class="uk-checkbox" type="checkbox"> Conceder permissões de Gestor</label>
+                </div>
+                <div class="uk-margin-top uk-text-right">
+                    <button class="uk-button uk-button-default uk-modal-close redondo" type="button">Cancelar</button>
+                    <button id="btnSalvarUsuario" class="uk-button uk-button-primary redondo" type="submit">Cadastrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div id="modal-nova-tarefa" uk-modal></div>
 
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.17.11/dist/js/uikit.min.js"></script>
