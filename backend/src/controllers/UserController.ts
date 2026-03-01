@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from '../utils/prisma';
+import bcrypt from 'bcrypt';
 
 export class UserController {
     listAll = async (req: Request, res: Response): Promise<void> => {
@@ -32,7 +33,7 @@ export class UserController {
                 return;
             }
 
-            const bcrypt = require('bcrypt');
+            //const bcrypt = require('bcrypt');
             const passwordHash = await bcrypt.hash(password, 10);
             const newUser = await prisma.user.create({
                 data: {
