@@ -16,10 +16,11 @@ api.useRequestInterceptor((config) => {
 });
 
 api.useResponseInterceptor((response) => {
-    if (response.status === 401) {
+    if (response.status === 401 && !response.url.includes('/auth/login')) {
         localStorage.removeItem('@Leve:token');
         localStorage.removeItem('@Leve:user');
-        window.location.href = '/pages/login/index.html';
+        // Redirecionamento relativo para evitar quebra em subpastas
+        window.location.href = '../../pages/login/index.html';
     }
     return response;
 });
