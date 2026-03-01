@@ -20,14 +20,6 @@ O projeto foi estruturado no formato **Monorepo** para manter o código organiza
 
 ---
 
-## 🔒 Segurança & Variáveis de Ambiente
-
-Para manter o nível de profissionalismo e seguir as melhores práticas de segurança de software, o arquivo **`.env` foi intencionalmente adicionado ao `.gitignore`** e não se encontra neste repositório público.
-
-**⚠️ Atenção Avaliador:** O arquivo `.env` contendo a `DATABASE_URL`, as chaves secretas do JWT e as credenciais de SMTP será **enviado em anexo no e-mail de entrega do desafio**. Por favor, coloque-o na raiz da pasta `/backend` antes de iniciar a aplicação.
-
----
-
 ## 🛠️ Como Executar o Projeto Localmente
 
 ### 1. Pré-requisitos
@@ -36,21 +28,27 @@ Para manter o nível de profissionalismo e seguir as melhores práticas de segur
 
 ### 2. Clonando o Repositório
 ```bash
-git clone [https://github.com/seu-usuario/leve-investimentos.git](https://github.com/seu-usuario/leve-investimentos.git)
+git clone https://github.com/Pedro6Stein/leve-investimentos.git
 cd leve-investimentos/backend
-3. Configuração do Banco de Dados (Infraestrutura)
+3. Configuração das Variáveis de Ambiente (.env)
+Como este é um projeto de avaliação técnica e o banco de dados é executado localmente, as credenciais foram deixadas explícitas para facilitar o setup. Crie um arquivo chamado .env na raiz da pasta backend/ e cole o conteúdo abaixo:
+
+Fragmento do código
+DATABASE_URL="sqlserver://localhost:1433;database=LeveDB;user=sa;password=LevePassword123!;encrypt=true;trustServerCertificate=true"
+JWT_SECRET="super_secret_jwt_key_leve_2026"
+PORT=3333
+4. Configuração do Banco de Dados (Infraestrutura)
 Você tem duas opções para o banco de dados SQL Server:
 
 Opção A: Usando o Docker (Recomendado/Mais rápido)
-O projeto inclui um arquivo docker-compose.yml já configurado. Basta rodar:
+O projeto inclui um arquivo docker-compose.yml já configurado com a senha correspondente ao .env. Basta rodar:
 
 Bash
 docker-compose up -d
 Opção B: Usando o seu SQL Server Local
-Se não quiser usar o Docker, basta garantir que o seu SQL Server esteja rodando e atualizar a variável DATABASE_URL no arquivo .env (enviado por e-mail) com as suas credenciais locais. Formato padrão:
-sqlserver://localhost:1433;database=LeveDB;user=SA;password=SuaSenha;trustServerCertificate=true;
+Se não quiser usar o Docker, basta garantir que o seu SQL Server esteja rodando e usar a mesma string de conexão fornecida no passo 3.
 
-4. Instalação, Modelagem e População do Banco
+5. Instalação, Modelagem e População do Banco
 A modelagem e a população do banco de dados são gerenciadas de forma automatizada e segura pelo Prisma ORM.
 
 No terminal, dentro da pasta /backend, execute sequencialmente:
@@ -64,7 +62,7 @@ npx prisma migrate dev --name init
 
 # Popula o banco com os dados iniciais exigidos (Equivalente ao Script de População)
 npm run seed
-5. Iniciando a Aplicação
+6. Iniciando a Aplicação
 Com o banco pronto, inicie o servidor:
 
 Bash
@@ -78,4 +76,4 @@ E-mail: ti@leveinvestimentos.com.br
 
 Senha: teste123
 
-Desenvolvido com ☕ e dedicação por Pedro Stein.
+Desenvolvido com ☕ e dedicação por Pedro Stein
