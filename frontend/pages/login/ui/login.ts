@@ -4,7 +4,7 @@ import { HttpError } from '../../../shared/api/httpClient.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     if (localStorage.getItem('@Leve:token')) {
-        window.location.href = '../../../systems/ops/index.html';
+        window.location.href = '../../dashboard/ui/index.html';
         return;
     }
 
@@ -20,24 +20,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = passwordInput.value;
 
         const originalBtnText = loginBtn.innerHTML;
-        loginBtn.innerHTML = '<div uk-spinner=""ratio: 0.6""></div> Autenticando...';
+        loginBtn.innerHTML = '<div uk-spinner="ratio: 0.6"></div> Autenticando...';
         loginBtn.disabled = true;
 
         try {
-            // Chamamos a Feature limpa
             const data = await loginByEmail(email, password);
 
             localStorage.setItem('@Leve:token', data.token);
             localStorage.setItem('@Leve:user', JSON.stringify(data.user));
 
             UIkit.notification({
-                message: <span uk-icon='icon: check'></span> Sucesso! Redirecionando...,
+                message: `<span uk-icon='icon: check'></span> Sucesso! Redirecionando...`,
                 status: 'success',
                 pos: 'top-right'
             });
 
             setTimeout(() => {
-                window.location.href = '../../../systems/ops/index.html';
+                window.location.href = '../../dashboard/ui/index.html';
             }, 800);
 
         } catch (error) {
@@ -48,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             UIkit.notification({
-                message: <span uk-icon='icon: warning'></span>  + errorMessage,
+                message: `<span uk-icon='icon: warning'></span> ${errorMessage}`,
                 status: 'danger',
                 pos: 'top-right'
             });

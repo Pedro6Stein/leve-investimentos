@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEVE Ops - Painel Operacional</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.17.11/dist/css/uikit.min.css" />
+    <link rel="stylesheet" href="../../../shared/css/global.css" />
+    <link rel="stylesheet" href="dashboard.css" />
+</head>
+<body class="bg-cinza">
+    <nav class="uk-navbar-container uk-background-primary uk-light" uk-navbar>
+        <div class="uk-navbar-left">
+            <a class="uk-navbar-item uk-logo uk-text-bold" href="#">LEVE Ops</a>
+        </div>
+        <div class="uk-navbar-right">
+            <ul class="uk-navbar-nav">
+                <li>
+                    <a href="#">
+                        <span uk-icon="icon: user; ratio: 0.9" class="uk-margin-small-right"></span>
+                        <span id="userNameDisplay">A carregar...</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" id="logoutBtn" class="uk-text-danger">
+                        <span uk-icon="icon: sign-out"></span> Sair
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="uk-container uk-container-xlarge uk-margin-large-top">
+        <div class="uk-flex uk-flex-between uk-flex-middle uk-margin-bottom">
+            <div>
+                <h2 class="uk-margin-remove-bottom uk-text-bold">Gestão de Tarefas</h2>
+                <p class="uk-text-meta uk-margin-remove-top">Acompanhe e gira as demandas da equipa.</p>
+            </div>
+            
+            <div id="managerActions" style="display: none;">
+                <button class="uk-button uk-button-primary redondo" uk-toggle="target: #modal-nova-tarefa">
+                    <span uk-icon="icon: plus"></span> Nova Tarefa
+                </button>
+            </div>
+        </div>
+
+        <div class="uk-card uk-card-default redondo uk-box-shadow-small">
+            <div class="uk-card-body uk-padding-small" id="tasksGridContainer">
+                <div class="uk-text-center uk-padding">
+                    <div uk-spinner></div>
+                    <p>A carregar tarefas...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-nova-tarefa" uk-modal>
+        </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.17.11/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.17.11/dist/js/uikit-icons.min.js"></script>
+    <script type="module" src="../../../dist/pages/dashboard/ui/dashboard.js"></script>
+</body>
+</html>
