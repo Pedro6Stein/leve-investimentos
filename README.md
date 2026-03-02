@@ -1,9 +1,3 @@
-Perfeito, Pedro! Limpei todas aquelas quebras de linha estranhas ("Fragmento de código", "Bash") que ficam quando a gente copia e cola, e já juntei com a **sua versão final** (com o Docker como Bônus e o `.env` de produção com a instrução da senha no e-mail).
-
-Ficou lindo, profissional e pronto para ir direto para o seu repositório.
-
-Basta clicar em **"Copiar código"** (no canto superior direito do bloco abaixo) e colar no seu arquivo `README.md`:
-
 ```markdown
 # ⚡ LEVE Ops — Sistema de Gestão Operacional
 
