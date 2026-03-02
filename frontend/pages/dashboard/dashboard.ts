@@ -67,13 +67,13 @@ async function setupUserModal() {
             }
 
             await createUser({
-                fullName:  (document.getElementById('newUserName')      as HTMLInputElement).value,
-                email:     (document.getElementById('newUserEmail')     as HTMLInputElement).value,
-                password:  (document.getElementById('newUserPassword')  as HTMLInputElement).value,
+                fullName: (document.getElementById('newUserName') as HTMLInputElement).value,
+                email: (document.getElementById('newUserEmail') as HTMLInputElement).value,
+                password: (document.getElementById('newUserPassword') as HTMLInputElement).value,
                 birthDate: (document.getElementById('newUserBirthDate') as HTMLInputElement).value,
-                mobile:    (document.getElementById('newUserMobile')    as HTMLInputElement).value,
-                landline:  (document.getElementById('newUserLandline')  as HTMLInputElement).value || undefined,
-                address:   (document.getElementById('newUserAddress')   as HTMLInputElement).value,
+                mobile: (document.getElementById('newUserMobile') as HTMLInputElement).value,
+                landline: (document.getElementById('newUserLandline') as HTMLInputElement).value || undefined,
+                address: (document.getElementById('newUserAddress') as HTMLInputElement).value,
                 isManager: (document.getElementById('newUserIsManager') as HTMLInputElement).checked,
                 photo,
             });
@@ -107,7 +107,6 @@ async function setupTaskModal() {
     const select = document.getElementById('newTaskAssignee') as HTMLSelectElement;
     const form = document.getElementById('formNovaTarefa') as HTMLFormElement;
     const btn = document.getElementById('btnSalvarTarefa') as HTMLButtonElement;
-
     try {
         const users = await loadUsers();
         users.forEach(u => {
@@ -128,15 +127,27 @@ async function setupTaskModal() {
         e.preventDefault();
         if (!form.checkValidity()) { form.reportValidity(); return; }
 
+        const dueDate = (document.getElementById('newTaskDueDate') as HTMLInputElement).value;
+        const today = new Date().toISOString().split('T')[0];
+
+        if (dueDate < today) {
+            UIkit.notification({
+                message: `<span uk-icon='icon: warning'></span> A data limite não pode ser anterior a hoje.`,
+                status: 'warning',
+                pos: 'top-right'
+            });
+            return;
+        }
+
         const originalText = btn.innerHTML;
         btn.innerHTML = '<div uk-spinner="ratio: 0.5"></div> Criando...';
         btn.disabled = true;
 
         try {
             await createTask({
-                assigneeId:  (document.getElementById('newTaskAssignee')    as HTMLSelectElement).value,
+                assigneeId: (document.getElementById('newTaskAssignee') as HTMLSelectElement).value,
                 description: (document.getElementById('newTaskDescription') as HTMLTextAreaElement).value,
-                dueDate:     (document.getElementById('newTaskDueDate')     as HTMLInputElement).value,
+                dueDate: (document.getElementById('newTaskDueDate') as HTMLInputElement).value,
             });
 
             UIkit.notification({
@@ -165,18 +176,28 @@ async function setupTaskModal() {
 
 function setupEditTaskModal() {
     const btn = document.getElementById('btnSalvarEdicao') as HTMLButtonElement;
+    const today = new Date().toISOString().split('T')[0];
 
     btn.addEventListener('click', async (e) => {
         e.preventDefault();
 
-        const id          = (document.getElementById('editTaskId')          as HTMLInputElement).value;
-        const assigneeId  = (document.getElementById('editTaskAssignee')    as HTMLSelectElement).value;
+        const id = (document.getElementById('editTaskId') as HTMLInputElement).value;
+        const assigneeId = (document.getElementById('editTaskAssignee') as HTMLSelectElement).value;
         const description = (document.getElementById('editTaskDescription') as HTMLTextAreaElement).value;
-        const dueDate     = (document.getElementById('editTaskDueDate')     as HTMLInputElement).value;
+        const dueDate = (document.getElementById('editTaskDueDate') as HTMLInputElement).value;
 
         if (!assigneeId || !description || !dueDate) {
             UIkit.notification({
                 message: `<span uk-icon='icon: warning'></span> Preencha todos os campos.`,
+                status: 'warning',
+                pos: 'top-right'
+            });
+            return;
+        }
+
+        if (dueDate < today) {
+            UIkit.notification({
+                message: `<span uk-icon='icon: warning'></span> A data limite não pode ser anterior a hoje.`,
                 status: 'warning',
                 pos: 'top-right'
             });
@@ -216,9 +237,9 @@ function setupEditTaskModal() {
 function openEditModal(task: Task) {
     const editSelect = document.getElementById('editTaskAssignee') as HTMLSelectElement;
 
-    (document.getElementById('editTaskId')          as HTMLInputElement).value        = task.id;
-    (document.getElementById('editTaskDescription') as HTMLTextAreaElement).value     = task.description;
-    (document.getElementById('editTaskDueDate')     as HTMLInputElement).value        = task.dueDate.substring(0, 10);
+    (document.getElementById('editTaskId') as HTMLInputElement).value = task.id;
+    (document.getElementById('editTaskDescription') as HTMLTextAreaElement).value = task.description;
+    (document.getElementById('editTaskDueDate') as HTMLInputElement).value = task.dueDate.substring(0, 10);
 
     Array.from(editSelect.options).forEach(opt => {
         opt.selected = opt.value === task.assigneeId;
