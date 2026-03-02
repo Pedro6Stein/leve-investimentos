@@ -202,6 +202,7 @@ npx tsc -w
 Sirva os arquivos estáticos (exemplo com `serve`):
 
 ```bash
+npm install 
 npx serve . -p 3000
 ```
 
