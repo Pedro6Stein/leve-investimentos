@@ -126,15 +126,25 @@ docker compose up -d
 
 ---
 
-### 2.2) Alternativa: Executando sem Docker
+### 2.2) Alternativa: Executando sem Docker (Local)
 
-Se preferir não utilizar a infraestrutura em container, você precisará de uma instância do **SQL Server** rodando localmente:
+Se preferir não utilizar a infraestrutura em container, você precisará de uma instância do **SQL Server** rodando na sua máquina.
 
-1. Abra o seu gerenciador de banco de dados (ex: SSMS ou Azure Data Studio).
-2. Crie um banco de dados vazio chamado `LeveDB`.
-3. Crie o arquivo **`backend/.env`** e cole a configuração abaixo. Lembre-se apenas de alterar o `user` e a `password` na `DATABASE_URL` caso o seu SQL Server local utilize credenciais diferentes:
+1. Abra o seu gerenciador de banco de dados (ex: SSMS ou DBeaver).
+2. Crie um banco de dados vazio chamado exatamente `LeveDB`.
+3. Crie o arquivo **`backend/.env`**. Copie todo o bloco base abaixo e **escolha apenas uma** das opções de `DATABASE_URL`, dependendo de como o seu SQL Server está configurado:
 
-### 3) Variáveis de ambiente — Back-end
+```env
+# ==========================================
+# ESCOLHA A OPÇÃO DE DATABASE_URL ADEQUADA:
+# ==========================================
+
+# OPÇÃO A: Autenticação padrão com usuário 'sa' (Altere a senha se necessário)
+DATABASE_URL="sqlserver://localhost:1433;database=LeveDB;user=sa;password=LevePassword123!;encrypt=true;trustServerCertificate=true"
+
+# OPÇÃO B: Autenticação do Windows (Geralmente instâncias SQLEXPRESS)
+# DATABASE_URL="sqlserver://localhost\SQLEXPRESS;database=LeveDB;integratedSecurity=true;encrypt=true;trustServerCertificate=true"
+
 
 Crie o arquivo **`backend/.env`** com:
 
@@ -144,14 +154,14 @@ JWT_SECRET="super_secret_jwt_key_leve_2026"
 PORT=3333
 NODE_ENV="production"
 EMAIL_USER="enviataskleve@gmail.com"
-EMAIL_PASS="SENHA_DO_APP_AQUI" EU MANDEI NO EMAIL JUNTAMeNTE COM O LINK DO GIT
+EMAIL_PASS="" EU MANDEI NO EMAIL JUNTAMeNTE COM O LINK DO GIT
 ```
 
 > `EMAIL_PASS`: idealmente usar **senha de app** (a mesma informada na entrega).
 
 ---
 
-### 4) Instalar e rodar o Back-end
+### 3) Instalar e rodar o Back-end
 
 ```bash
 cd backend
@@ -180,7 +190,7 @@ A API sobe em:
 
 ---
 
-### 5) Rodar o Front-end
+### 4) Rodar o Front-end
 
 Em outro terminal:
 
