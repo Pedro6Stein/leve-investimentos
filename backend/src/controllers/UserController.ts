@@ -24,6 +24,9 @@ export class UserController {
                     fullName: true,
                     email: true,
                     mobile: true,
+                    landline: true,
+                    address: true,
+                    birthDate: true,
                     isManager: true,
                     createdAt: true,
                 },
@@ -38,9 +41,9 @@ export class UserController {
         try {
             const validation = createUserSchema.safeParse(req.body);
             if (!validation.success) {
-                res.status(400).json({ 
-                    error: 'Dados de cadastro inválidos', 
-                    details: validation.error.format() 
+                res.status(400).json({
+                    error: 'Dados de cadastro inválidos',
+                    details: validation.error.format()
                 });
                 return;
             }
@@ -48,7 +51,7 @@ export class UserController {
 
             // Criptografa a senha e salva no banco
             const passwordHash = await bcrypt.hash(password, 10);
-            
+
             const newUser = await prisma.user.create({
                 data: {
                     fullName,
@@ -61,9 +64,9 @@ export class UserController {
                     photo,
                     isManager, // O Zod já aplica o default(false) se não for enviado
                 },
-                select: { 
-                    id: true, 
-                    email: true, 
+                select: {
+                    id: true,
+                    email: true,
                     fullName: true,
                     landline: true,
                     mobile: true,
