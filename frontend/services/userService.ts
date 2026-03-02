@@ -10,6 +10,7 @@ export interface User {
     birthDate?: string;
     isManager: boolean;
     createdAt: string;
+    photo?: string;
 }
 
 export interface CreateUserData {

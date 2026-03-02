@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { prisma } from '../utils/prisma';
 import bcrypt from 'bcrypt';
 import { z } from 'zod';
+import { AuthenticatedRequest } from '../middlewares/authMiddleware';
 
 const createUserSchema = z.object({
     fullName: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres.'),
@@ -29,11 +30,12 @@ export class UserController {
                     birthDate: true,
                     isManager: true,
                     createdAt: true,
+                    photo: true,
                 },
             });
 
             res.status(200).json(users);
-        } catch (error) {
+        } catch {
             res.status(500).json({ error: 'Erro interno ao buscar usuários.' });
         }
     };
@@ -83,6 +85,40 @@ export class UserController {
             }
             console.error("ERRO REAL NA CRIAÇÃO DO USUÁRIO:", error);
             res.status(500).json({ error: 'Erro interno ao criar utilizador.' });
+        }
+    };
+    me = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+        try {
+            const userId = req.user?.userId;
+            if (!userId) {
+                res.status(401).json({ error: 'Token inválido ou ausente.' });
+                return;
+            }
+
+            const user = await prisma.user.findUnique({
+                where: { id: userId },
+                select: {
+                    id: true,
+                    fullName: true,
+                    email: true,
+                    mobile: true,
+                    landline: true,
+                    address: true,
+                    birthDate: true,
+                    isManager: true,
+                    createdAt: true,
+                    photo: true,
+                },
+            });
+
+            if (!user) {
+                res.status(404).json({ error: 'Usuário não encontrado.' });
+                return;
+            }
+
+            res.status(200).json(user);
+        } catch (error) {
+            res.status(500).json({ error: 'Erro interno ao buscar perfil.' });
         }
     };
 }
