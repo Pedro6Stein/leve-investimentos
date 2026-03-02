@@ -1,28 +1,90 @@
-/* Fundo ultra escuro para salvar as retinas */
+/* ═══════════════════════════════════════════════════════
+   LEVE OPS — Login Page
+   ═══════════════════════════════════════════════════════ */
+
 body {
-    background-color: #0f172a !important; /* Azul meia-noite */
-    background-image: radial-gradient(at 0% 0%, rgba(30, 41, 59, 1) 0, transparent 50%), 
-                      radial-gradient(at 50% 0%, rgba(15, 23, 42, 1) 0, transparent 50%) !important;
+    background-color: var(--navy-950) !important;
+    background-image:
+        radial-gradient(ellipse 70vw 60vh at 80% 10%, rgba(59,130,246,0.09) 0%, transparent 65%),
+        radial-gradient(ellipse 50vw 50vh at 10% 90%, rgba(201,168,76,0.07) 0%, transparent 60%),
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.015'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") !important;
 }
 
-.redondo {
-    border-radius: 8px !important;
+/* Card login */
+.leve-login-card {
+    position: relative;
+    overflow: hidden;
+}
+.leve-login-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), var(--blue-light), transparent);
+    opacity: 0.8;
 }
 
-/* Inputs Estilizados para Dark Mode */
+/* Logo */
+.leve-login-logo {
+    font-size: 1.8rem;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+}
+.leve-login-logo span { color: var(--gold); }
+
+.leve-login-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--gold-border);
+    background: var(--gold-dim);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+}
+
+/* Inputs */
 .uk-input {
-    background: #1e293b !important;
-    border: 1px solid #334155 !important;
-    color: #38bdf8 !important;
+    height: 46px !important;
+    padding-left: 40px !important;
+}
+
+/* Botão login */
+#loginBtn {
     height: 48px;
+    font-size: 0.92rem;
+    letter-spacing: 0.02em;
+    position: relative;
+    overflow: hidden;
+}
+#loginBtn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.12), transparent);
+    pointer-events: none;
 }
 
-.uk-input:focus {
-    border-color: #38bdf8 !important; /* Azul neon ao focar */
+/* Footer */
+.leve-login-footer {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
-
-.uk-card-default {
-    background: #1e293b !important;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #e2e8f0 !important;
+.leve-login-footer::before,
+.leve-login-footer::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
 }

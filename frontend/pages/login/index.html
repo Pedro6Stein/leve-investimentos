@@ -1,47 +1,140 @@
 ﻿<!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LEVE - Login</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.17.11/dist/css/uikit.min.css" />
-    <link rel="stylesheet" href="/shared/global.css">
-    <link rel="stylesheet" href="/pages/login/login.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LEVE Ops — Acesso</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800;9..40,900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.17.11/dist/css/uikit.min.css" />
+  <link rel="stylesheet" href="/shared/global.css">
+  <link rel="stylesheet" href="/pages/login/login.css">
 </head>
-<body class="bg-cinza">
-    <div class="uk-flex uk-flex-center uk-flex-middle" uk-height-viewport>
-        <div class="uk-width-medium uk-padding uk-card uk-card-default redondo uk-box-shadow-large">
-            <div class="uk-text-center uk-margin-bottom">
-                <h2 class="uk-text-bold uk-margin-remove">LEVE</h2>
-                <p class="uk-text-muted uk-margin-remove-top">Acesso ao Sistema</p>
+
+<body>
+  <div class="leve-shell">
+    <div class="uk-flex uk-flex-center uk-flex-middle" uk-height-viewport style="padding: 24px;">
+      <div style="width: 100%; max-width: 400px;" class="leve-fade-in">
+
+        <!-- Card -->
+        <div class="uk-card leve-glass leve-login-card" style="border-radius: var(--radius); padding: 40px 36px 32px;">
+
+          <!-- Brand -->
+          <div class="uk-text-center" style="margin-bottom: 32px;">
+            <div class="leve-login-badge">
+              <span uk-icon="icon: bolt; ratio: 0.7"></span>
+              Plataforma Operacional
+            </div>
+            <div class="leve-login-logo">
+              LEVE <span>Ops</span>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.82rem; margin: 6px 0 0; letter-spacing: 0.01em;">
+              Gestão de operações do setor financeiro
+            </p>
+          </div>
+
+          <!-- Divisor -->
+          <div class="leve-divider" style="margin-top: 0; margin-bottom: 24px;">Autenticação</div>
+
+          <!-- Form -->
+          <form id="loginForm" action="javascript:void(0);">
+
+            <div style="margin-bottom: 16px;">
+              <label class="uk-form-label">E-mail</label>
+              <div class="uk-inline uk-width-1-1" style="margin-top: 6px;">
+                <span class="uk-form-icon" uk-icon="icon: mail; ratio: 0.85"></span>
+                <input
+                  id="email"
+                  class="uk-input"
+                  type="email"
+                  placeholder="seuemail@empresa.com"
+                  autocomplete="email"
+                  required
+                  style="border-radius: var(--radius-xs) !important;"
+                >
+              </div>
             </div>
 
-            <form id="loginForm" action="javascript:void(0);">
-                <div class="uk-margin">
-                    <div class="uk-inline uk-width-1-1">
-                        <span class="uk-form-icon" uk-icon="icon: mail"></span>
-                        <input id="email" class="uk-input redondo" type="email" placeholder="E-mail" required>
-                    </div>
-                </div>
+            <div style="margin-bottom: 24px;">
+              <label class="uk-form-label">Senha</label>
+              <div class="uk-inline uk-width-1-1" style="margin-top: 6px; position: relative;">
+                <span class="uk-form-icon" uk-icon="icon: lock; ratio: 0.85"></span>
+                <input
+                  id="password"
+                  class="uk-input"
+                  type="password"
+                  placeholder="••••••••"
+                  autocomplete="current-password"
+                  required
+                  style="border-radius: var(--radius-xs) !important; padding-right: 44px !important;"
+                >
+                <button
+                  type="button"
+                  id="togglePasswordBtn"
+                  aria-label="Mostrar/ocultar senha"
+                  style="
+                    position: absolute; right: 0; top: 0; bottom: 0;
+                    width: 44px;
+                    background: transparent; border: 0; cursor: pointer;
+                    display: flex; align-items: center; justify-content: center;
+                    color: var(--text-muted);
+                    transition: var(--t);
+                    z-index: 10;
+                  "
+                >
+                  <span id="togglePasswordIcon" uk-icon="icon: eye; ratio: 0.85"></span>
+                </button>
+              </div>
+            </div>
 
-                <div class="uk-margin">
-                    <div class="uk-inline uk-width-1-1">
-                        <span class="uk-form-icon" uk-icon="icon: lock"></span>
-                        <input id="password" class="uk-input redondo" type="password" placeholder="Senha" required>
-                    </div>
-                </div>
+            <button
+              id="loginBtn"
+              class="uk-button uk-button-primary uk-width-1-1"
+              type="submit"
+              style="font-size: 0.92rem; letter-spacing: 0.02em;"
+            >
+              <span uk-icon="icon: sign-in; ratio: 0.85" style="margin-right: 6px;"></span>
+              Acessar LEVE Ops
+            </button>
 
-                <div class="uk-margin">
-                    <button id="loginBtn" class="uk-button uk-button-primary uk-width-1-1 redondo" type="submit">
-                        Acessar Sistema
-                    </button>
-                </div>
-            </form>
+          </form>
+
+          <!-- Footer do card -->
+          <div class="leve-login-footer" style="margin-top: 24px;">
+            Segurança e rastreabilidade
+          </div>
+
         </div>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/uikit@3.17.11/dist/js/uikit.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/uikit@3.17.11/dist/js/uikit-icons.min.js"></script>
-    <script type="module" src="/dist/pages/login/login.js"></script>
+        <!-- Rodapé externo -->
+        <p style="text-align: center; color: var(--text-dim); font-size: 0.72rem; margin-top: 20px; letter-spacing: 0.02em;">
+          LEVE Investimentos · Sistema interno · Acesso restrito
+        </p>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/uikit@3.17.11/dist/js/uikit.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/uikit@3.17.11/dist/js/uikit-icons.min.js"></script>
+  <script type="module" src="/dist/pages/login/login.js"></script>
+
+  <script>
+    (function () {
+      const input = document.getElementById('password');
+      const btn   = document.getElementById('togglePasswordBtn');
+      const icon  = document.getElementById('togglePasswordIcon');
+      if (!input || !btn || !icon) return;
+      btn.addEventListener('click', function () {
+        const isHidden = input.getAttribute('type') === 'password';
+        input.setAttribute('type', isHidden ? 'text' : 'password');
+        icon.setAttribute('uk-icon', isHidden ? 'icon: eye-slash; ratio: 0.85' : 'icon: eye; ratio: 0.85');
+        if (window.UIkit && UIkit.icon) UIkit.icon(icon);
+      });
+    })();
+  </script>
 </body>
 </html>

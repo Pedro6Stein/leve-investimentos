@@ -257,7 +257,18 @@ async function renderTasks(isManager: boolean) {
 
     try {
         const tasks = isManager ? await loadManagedTasks() : await loadMyTasks();
+        const total = tasks.length;
+        const pending = tasks.filter(t => t.status === 1).length;
+        const completed = tasks.filter(t => t.status !== 1).length;
 
+        const elTotal = document.getElementById('statsTotal');
+        const elPending = document.getElementById('statsPending');
+        const elCompleted = document.getElementById('statsCompleted');
+
+        if (elTotal) elTotal.textContent = String(total);
+        if (elPending) elPending.textContent = String(pending);
+        if (elCompleted) elCompleted.textContent = String(completed);
+        
         const columns = [
             {
                 header: isManager ? 'Colaborador' : 'Gestor',

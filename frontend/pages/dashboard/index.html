@@ -1,239 +1,539 @@
 ﻿<!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LEVE Ops - Painel Operacional</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.17.11/dist/css/uikit.min.css">
-    <link rel="stylesheet" href="/shared/global.css">
-    <link rel="stylesheet" href="/pages/dashboard/dashboard.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LEVE Ops — Dashboard</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800;9..40,900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.17.11/dist/css/uikit.min.css" />
+  <link rel="stylesheet" href="/shared/global.css">
+  <link rel="stylesheet" href="/pages/dashboard/dashboard.css">
 </head>
 
-<body class="bg-cinza">
-    <nav class="uk-navbar-container" uk-navbar>
-        <div class="uk-navbar-left">
-            <a class="uk-navbar-item uk-logo uk-text-bold" href="#">LEVE Ops</a>
-        </div>
-        <div class="uk-navbar-right">
-            <ul class="uk-navbar-nav">
-                <li>
-                    <a href="#" id="perfilBtn">
-                        <span uk-icon="icon: user; ratio: 0.9" class="uk-margin-small-right"></span>
-                        <span id="userNameDisplay"></span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" id="logoutBtn" class="uk-text-danger">
-                        <span uk-icon="icon: sign-out"></span> Sair
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </nav>
+<body>
 
-    <div class="uk-container uk-container-xlarge uk-margin-large-top">
-        <div class="uk-flex uk-flex-between uk-flex-middle uk-margin-bottom">
+<!-- ═══════════════════════════════════════════════════
+     NAVBAR
+     ═══════════════════════════════════════════════════ -->
+<nav class="uk-navbar-container" uk-navbar>
+  <div class="uk-navbar-left" style="padding-left: 4px;">
+    <a class="uk-navbar-item uk-logo" href="#" style="gap: 10px; padding: 0 16px 0 0;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="
+          width: 32px; height: 32px;
+          border-radius: 8px;
+          background: linear-gradient(135deg, var(--gold), #8B6914);
+          display: flex; align-items: center; justify-content: center;
+          box-shadow: 0 2px 8px rgba(201,168,76,0.35);
+        ">
+          <span uk-icon="icon: bolt; ratio: 0.8" style="color: var(--navy-950);"></span>
+        </div>
+        <span class="leve-logo-text">LEVE <span>Ops</span></span>
+      </div>
+    </a>
+  </div>
+
+  <div class="uk-navbar-right" style="gap: 4px; padding-right: 4px;">
+
+    <!-- Ações do gestor -->
+    <div id="managerActions" style="display: none; align-items: center; gap: 6px;">
+      <button
+        class="uk-button uk-button-primary uk-button-small"
+        uk-toggle="target: #modal-nova-tarefa"
+        uk-tooltip="title: Nova Tarefa; pos: bottom"
+        style="display: flex; align-items: center; gap: 6px;"
+      >
+        <span uk-icon="icon: plus; ratio: 0.8"></span>
+        <span>Nova Tarefa</span>
+      </button>
+
+      <button
+        class="uk-button uk-button-default uk-button-small"
+        uk-toggle="target: #modal-cadastro-usuario"
+        uk-tooltip="title: Cadastrar Colaborador; pos: bottom"
+        style="display: flex; align-items: center; gap: 6px;"
+      >
+        <span uk-icon="icon: user; ratio: 0.8"></span>
+        <span>Novo Usuário</span>
+      </button>
+
+      <div class="leve-nav-sep"></div>
+    </div>
+
+    <!-- Perfil -->
+    <a
+      id="perfilBtn"
+      href="#"
+      class="uk-navbar-item"
+      style="gap: 10px; padding: 0 12px; cursor: pointer; text-decoration: none;"
+      uk-tooltip="title: Meu perfil; pos: bottom-right"
+    >
+      <div class="leve-avatar" id="navAvatar">?</div>
+      <span id="userNameDisplay" style="font-size: 0.85rem; font-weight: 600; color: var(--text-sub); max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></span>
+      <span uk-icon="icon: chevron-down; ratio: 0.75" style="color: var(--text-dim);"></span>
+    </a>
+
+    <div class="leve-nav-sep"></div>
+
+    <!-- Logout -->
+    <button
+      id="logoutBtn"
+      class="leve-btn-icon"
+      uk-tooltip="title: Sair; pos: bottom-right"
+      style="background: none; border: none; cursor: pointer;"
+    >
+      <span uk-icon="icon: sign-out; ratio: 0.85"></span>
+    </button>
+
+  </div>
+</nav>
+
+
+<!-- ═══════════════════════════════════════════════════
+     CONTEÚDO PRINCIPAL
+     ═══════════════════════════════════════════════════ -->
+<div class="uk-container uk-container-expand" style="padding: 0 28px; max-width: 1400px; margin: 0 auto;">
+
+  <!-- Page header -->
+  <div class="leve-page-header uk-flex uk-flex-middle uk-flex-between">
+    <div>
+      <h1 class="leve-page-title">Painel de Operações</h1>
+      <p class="leve-page-sub" id="pageSubtitle">Carregando...</p>
+    </div>
+    <div id="headerDate" class="leve-mono" style="font-size: 0.75rem; color: var(--text-dim); text-align: right;"></div>
+  </div>
+
+  <!-- Stats cards -->
+  <div class="leve-stats" style="margin-bottom: 24px;" id="statsContainer">
+    <div class="leve-stat-card leve-stat-card--total leve-fade-in" style="animation-delay: 0ms">
+      <div class="leve-stat-icon"><span uk-icon="icon: list; ratio: 1"></span></div>
+      <div class="leve-stat-value" id="statTotal">—</div>
+      <div class="leve-stat-label">Total de Tarefas</div>
+    </div>
+    <div class="leve-stat-card leve-stat-card--pending leve-fade-in" style="animation-delay: 60ms">
+      <div class="leve-stat-icon"><span uk-icon="icon: clock; ratio: 1"></span></div>
+      <div class="leve-stat-value" id="statPending">—</div>
+      <div class="leve-stat-label">Pendentes</div>
+    </div>
+    <div class="leve-stat-card leve-stat-card--done leve-fade-in" style="animation-delay: 120ms">
+      <div class="leve-stat-icon"><span uk-icon="icon: check; ratio: 1"></span></div>
+      <div class="leve-stat-value" id="statDone">—</div>
+      <div class="leve-stat-label">Concluídas</div>
+    </div>
+    <!-- Card extra para gestor — aparece via JS se isManager -->
+    <div class="leve-stat-card leve-stat-card--team leve-fade-in" id="statTeamCard" style="display: none; animation-delay: 180ms">
+      <div class="leve-stat-icon"><span uk-icon="icon: users; ratio: 1"></span></div>
+      <div class="leve-stat-value" id="statTeam">—</div>
+      <div class="leve-stat-label">Colaboradores</div>
+    </div>
+  </div>
+
+  <!-- Tabela -->
+  <div class="leve-table-wrap leve-fade-in" style="animation-delay: 200ms; margin-bottom: 40px;">
+    <div class="leve-table-header">
+      <div class="leve-table-title">
+        <span uk-icon="icon: table; ratio: 0.8"></span>
+        Tarefas
+        <span class="leve-count-badge" id="taskCount">0</span>
+      </div>
+      <div style="font-size: 0.75rem; color: var(--text-dim);">
+        Duplo clique para editar (gestores)
+      </div>
+    </div>
+    <div id="tasksGridContainer"></div>
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     MODAL — NOVA TAREFA
+     ═══════════════════════════════════════════════════ -->
+<div id="modal-nova-tarefa" uk-modal>
+  <div class="uk-modal-dialog" style="width: 520px; max-width: calc(100vw - 32px);">
+
+    <div class="leve-modal-header">
+      <div class="leve-modal-icon">
+        <span uk-icon="icon: plus-circle; ratio: 0.9"></span>
+      </div>
+      <div>
+        <div class="leve-modal-title">Nova Tarefa</div>
+        <div class="leve-modal-sub">Atribua uma tarefa a um colaborador</div>
+      </div>
+      <button class="uk-modal-close-default" type="button" uk-close style="margin-left: auto;"></button>
+    </div>
+
+    <form id="formNovaTarefa" action="javascript:void(0);" class="leve-modal-body">
+
+      <div style="margin-bottom: 14px;">
+        <label class="uk-form-label">Colaborador</label>
+        <div style="margin-top: 6px;">
+          <select id="newTaskAssignee" class="uk-select" required>
+            <option value="" disabled selected>Selecione o colaborador...</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 14px;">
+        <label class="uk-form-label">Descrição da Tarefa</label>
+        <div style="margin-top: 6px;">
+          <textarea
+            id="newTaskDescription"
+            class="uk-textarea"
+            placeholder="Descreva a tarefa detalhadamente..."
+            rows="3"
+            required
+            style="border-radius: var(--radius-xs) !important; resize: vertical;"
+          ></textarea>
+        </div>
+      </div>
+
+      <div>
+        <label class="uk-form-label">Data Limite</label>
+        <div style="margin-top: 6px;">
+          <input id="newTaskDueDate" class="uk-input" type="date" required style="border-radius: var(--radius-xs) !important;">
+        </div>
+      </div>
+
+    </form>
+
+    <div class="leve-modal-footer">
+      <button class="uk-button uk-button-default uk-button-small uk-modal-close" type="button">Cancelar</button>
+      <button id="btnSalvarTarefa" class="uk-button uk-button-primary uk-button-small" type="button">
+        <span uk-icon="icon: check; ratio: 0.8" style="margin-right: 4px;"></span>
+        Criar Tarefa
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     MODAL — EDITAR TAREFA
+     ═══════════════════════════════════════════════════ -->
+<div id="modal-editar-tarefa" uk-modal>
+  <div class="uk-modal-dialog" style="width: 520px; max-width: calc(100vw - 32px);">
+
+    <div class="leve-modal-header">
+      <div class="leve-modal-icon" style="background: var(--blue-dim); border-color: rgba(59,130,246,0.3); color: var(--blue-light);">
+        <span uk-icon="icon: pencil; ratio: 0.9"></span>
+      </div>
+      <div>
+        <div class="leve-modal-title">Editar Tarefa</div>
+        <div class="leve-modal-sub">Atualize os dados da tarefa</div>
+      </div>
+      <button class="uk-modal-close-default" type="button" uk-close style="margin-left: auto;"></button>
+    </div>
+
+    <div class="leve-modal-body">
+      <input type="hidden" id="editTaskId">
+
+      <div style="margin-bottom: 14px;">
+        <label class="uk-form-label">Colaborador</label>
+        <div style="margin-top: 6px;">
+          <select id="editTaskAssignee" class="uk-select" required>
+            <option value="" disabled selected>Selecione o colaborador...</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 14px;">
+        <label class="uk-form-label">Descrição da Tarefa</label>
+        <div style="margin-top: 6px;">
+          <textarea
+            id="editTaskDescription"
+            class="uk-textarea"
+            rows="3"
+            required
+            style="border-radius: var(--radius-xs) !important; resize: vertical;"
+          ></textarea>
+        </div>
+      </div>
+
+      <div>
+        <label class="uk-form-label">Data Limite</label>
+        <div style="margin-top: 6px;">
+          <input id="editTaskDueDate" class="uk-input" type="date" required style="border-radius: var(--radius-xs) !important;">
+        </div>
+      </div>
+    </div>
+
+    <div class="leve-modal-footer">
+      <button class="uk-button uk-button-default uk-button-small uk-modal-close" type="button">Cancelar</button>
+      <button id="btnSalvarEdicao" class="uk-button uk-button-primary uk-button-small" type="button">
+        <span uk-icon="icon: check; ratio: 0.8" style="margin-right: 4px;"></span>
+        Salvar Alterações
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     MODAL — CADASTRO DE USUÁRIO
+     ═══════════════════════════════════════════════════ -->
+<div id="modal-cadastro-usuario" uk-modal>
+  <div class="uk-modal-dialog" style="width: 560px; max-width: calc(100vw - 32px);">
+
+    <div class="leve-modal-header">
+      <div class="leve-modal-icon" style="background: var(--ok-dim); border-color: var(--ok-border); color: var(--ok);">
+        <span uk-icon="icon: user; ratio: 0.9"></span>
+      </div>
+      <div>
+        <div class="leve-modal-title">Cadastrar Colaborador</div>
+        <div class="leve-modal-sub">Adicione um novo membro à equipe</div>
+      </div>
+      <button class="uk-modal-close-default" type="button" uk-close style="margin-left: auto;"></button>
+    </div>
+
+    <form id="formCadastroUsuario" action="javascript:void(0);" class="leve-modal-body">
+
+      <!-- Foto -->
+      <div class="leve-form-section">Foto do perfil</div>
+      <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+        <div id="photoPreviewContainer" style="display:none;">
+          <img id="photoPreview" class="leve-photo-preview" alt="Preview" style="display:block;">
+        </div>
+        <div class="leve-photo-upload uk-flex-1" style="flex: 1;">
+          <div uk-form-custom style="width: 100%;">
+            <input type="file" id="newUserPhoto" accept="image/*">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--text-muted); font-size: 0.82rem;">
+              <span uk-icon="icon: image; ratio: 0.9"></span>
+              <span id="photoLabel">Selecionar foto</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dados pessoais -->
+      <div class="leve-form-section">Dados pessoais</div>
+      <div uk-grid class="uk-grid-small">
+        <div class="uk-width-1-1">
+          <label class="uk-form-label">Nome completo</label>
+          <input id="newUserName" class="uk-input" type="text" placeholder="Nome Sobrenome" required style="margin-top: 6px; border-radius: var(--radius-xs) !important;">
+        </div>
+        <div class="uk-width-1-2@s">
+          <label class="uk-form-label">Celular</label>
+          <input id="newUserMobile" class="uk-input" type="tel" placeholder="(11) 99999-9999" required style="margin-top: 6px; border-radius: var(--radius-xs) !important;">
+        </div>
+        <div class="uk-width-1-2@s">
+          <label class="uk-form-label">Telefone Fixo <span style="color: var(--text-dim);">(opcional)</span></label>
+          <input id="newUserLandline" class="uk-input" type="tel" placeholder="(11) 3333-3333" style="margin-top: 6px; border-radius: var(--radius-xs) !important;">
+        </div>
+        <div class="uk-width-1-2@s">
+          <label class="uk-form-label">Data de Nascimento</label>
+          <input id="newUserBirthDate" class="uk-input" type="date" required style="margin-top: 6px; border-radius: var(--radius-xs) !important;">
+        </div>
+        <div class="uk-width-1-2@s">
+          <label class="uk-form-label">Endereço</label>
+          <input id="newUserAddress" class="uk-input" type="text" placeholder="Rua, número, cidade" required style="margin-top: 6px; border-radius: var(--radius-xs) !important;">
+        </div>
+      </div>
+
+      <!-- Acesso -->
+      <div class="leve-form-section">Credenciais de acesso</div>
+      <div uk-grid class="uk-grid-small">
+        <div class="uk-width-1-1">
+          <label class="uk-form-label">E-mail</label>
+          <input id="newUserEmail" class="uk-input" type="email" placeholder="colaborador@empresa.com" required style="margin-top: 6px; border-radius: var(--radius-xs) !important;">
+        </div>
+        <div class="uk-width-1-1">
+          <label class="uk-form-label">Senha</label>
+          <input id="newUserPassword" class="uk-input" type="password" placeholder="Senha de acesso" required style="margin-top: 6px; border-radius: var(--radius-xs) !important;">
+        </div>
+        <div class="uk-width-1-1">
+          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px 12px; border-radius: var(--radius-xs); border: 1px solid var(--border-mid); background: rgba(6,12,23,0.4); transition: var(--t);" onmouseover="this.style.borderColor='var(--gold-border)'" onmouseout="this.style.borderColor='var(--border-mid)'">
+            <input id="newUserIsManager" class="uk-checkbox" type="checkbox">
             <div>
-                <h2 class="uk-margin-remove-bottom uk-text-bold">Gestão de Tarefas</h2>
-                <p class="uk-text-meta uk-margin-remove-top">Acompanhe e gerencie as demandas da equipa.</p>
+              <div style="font-weight: 600; font-size: 0.85rem; color: var(--text-main);">Perfil Gestor</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">Gestor pode criar tarefas e cadastrar usuários</div>
             </div>
-
-            <div id="managerActions" style="display: none;">
-                <button class="uk-button uk-button-primary redondo" uk-toggle="target: #modal-cadastro-usuario">
-                    <span uk-icon="icon: user-add"></span> Cadastrar Usuário
-                </button>
-                <button class="uk-button uk-button-secondary redondo uk-margin-small-left"
-                    uk-toggle="target: #modal-nova-tarefa">
-                    <span uk-icon="icon: plus"></span> Nova Tarefa
-                </button>
-            </div>
+          </label>
         </div>
+      </div>
 
-        <div class="uk-card uk-card-default redondo uk-box-shadow-small">
-            <div class="uk-card-body uk-padding-small" id="tasksGridContainer">
-                <div class="uk-text-center uk-padding">
-                    <div uk-spinner></div>
-                </div>
-            </div>
-        </div>
+    </form>
+
+    <div class="leve-modal-footer">
+      <button class="uk-button uk-button-default uk-button-small uk-modal-close" type="button">Cancelar</button>
+      <button id="btnSalvarUsuario" class="uk-button uk-button-primary uk-button-small" type="button">
+        <span uk-icon="icon: check; ratio: 0.8" style="margin-right: 4px;"></span>
+        Cadastrar
+      </button>
     </div>
 
-    <div id="modal-cadastro-usuario" uk-modal>
-        <div class="uk-modal-dialog uk-modal-body uk-card-default redondo">
-            <button class="uk-modal-close-default" type="button" uk-close></button>
-            <h2 class="uk-modal-title uk-text-bold">Novo Colaborador</h2>
-            <form id="formCadastroUsuario" action="javascript:void(0);">
-                <div class="uk-margin">
-                    <label class="uk-form-label">Nome Completo</label>
-                    <input id="newUserName" class="uk-input redondo" type="text" placeholder="Nome Completo" required
-                        minlength="3" maxlength="150">
-                </div>
-                <div class="uk-grid-small" uk-grid>
-                    <div class="uk-width-1-2@s">
-                        <label class="uk-form-label">E-mail</label>
-                        <input id="newUserEmail" class="uk-input redondo" type="email" placeholder="E-mail corporativo"
-                            required maxlength="100">
-                    </div>
-                    <div class="uk-width-1-2@s">
-                        <label class="uk-form-label">Senha Inicial</label>
-                        <input id="newUserPassword" class="uk-input redondo" type="password"
-                            placeholder="Mínimo 6 caracteres" required minlength="6" maxlength="255">
-                    </div>
-                </div>
-                <div class="uk-grid-small uk-margin-top" uk-grid>
-                    <div class="uk-width-1-3@s">
-                        <label class="uk-form-label">Data de Nascimento</label>
-                        <input id="newUserBirthDate" class="uk-input redondo" type="date" required>
-                    </div>
-                    <div class="uk-width-1-3@s">
-                        <label class="uk-form-label">Celular</label>
-                        <input id="newUserMobile" class="uk-input redondo" type="text" placeholder="Mín. 9 dígitos"
-                            required minlength="9" maxlength="20">
-                    </div>
-                    <div class="uk-width-1-3@s">
-                        <label class="uk-form-label">Telefone Fixo (Opcional)</label>
-                        <input id="newUserLandline" class="uk-input redondo" type="text" placeholder="Tel. Fixo"
-                            maxlength="20">
-                    </div>
-                </div>
-                <div class="uk-margin">
-                    <label class="uk-form-label">Endereço</label>
-                    <input id="newUserAddress" class="uk-input redondo" type="text" placeholder="Endereço Completo"
-                        required minlength="5" maxlength="255">
-                </div>
-                <div class="uk-margin">
-                    <label class="uk-form-label">Foto do Colaborador (Opcional)</label>
-                    <div class="uk-flex uk-flex-middle" style="gap: 16px;">
-                        <div id="photoPreviewContainer" style="display:none;">
-                            <img id="photoPreview"
-                                style="width: 64px; height: 64px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-color);">
-                        </div>
-                        <div style="flex: 1;">
-                            <div uk-form-custom="target: #newUserPhotoLabel">
-                                <input id="newUserPhoto" type="file" accept="image/*">
-                                <button class="uk-button uk-button-default redondo" type="button">
-                                    <span uk-icon="icon: upload"></span> Escolher foto
-                                </button>
-                                <input id="newUserPhotoLabel" class="uk-input redondo uk-margin-small-left" type="text"
-                                    placeholder="Nenhum arquivo selecionado" readonly style="width: auto;">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
-                    <label><input id="newUserIsManager" class="uk-checkbox" type="checkbox"> Conceder permissões de
-                        Gestor</label>
-                </div>
-                <div class="uk-margin-top uk-text-right">
-                    <button class="uk-button uk-button-default uk-modal-close redondo" type="button">Cancelar</button>
-                    <button id="btnSalvarUsuario" class="uk-button uk-button-primary redondo"
-                        type="button">Cadastrar</button>
-                </div>
-            </form>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     MODAL — PERFIL
+     ═══════════════════════════════════════════════════ -->
+<div id="modal-perfil" uk-modal>
+  <div class="uk-modal-dialog" style="width: 480px; max-width: calc(100vw - 32px);">
+
+    <div class="leve-modal-header" style="padding-bottom: 20px;">
+      <div>
+        <!-- Avatar grande -->
+        <div class="leve-perfil-avatar-wrap" id="perfilFotoPlaceholder" style="display: flex;">
+          <span uk-icon="icon: user; ratio: 1.4"></span>
         </div>
+        <img id="perfilFoto" style="
+          width: 72px; height: 72px;
+          border-radius: var(--radius-pill);
+          object-fit: cover;
+          border: 2px solid var(--gold-border);
+          box-shadow: 0 0 0 4px var(--gold-dim);
+          display: none;
+        " alt="Foto">
+      </div>
+      <div style="flex: 1;">
+        <h3 id="perfilNome" style="margin: 0; font-size: 1.05rem; font-weight: 700; letter-spacing: -0.01em;"></h3>
+        <p id="perfilEmail" style="margin: 2px 0 8px; font-size: 0.82rem; color: var(--text-muted); font-family: 'DM Mono', monospace;"></p>
+        <span id="perfilBadge" class="leve-role-badge leve-role-badge--staff"></span>
+      </div>
+      <button class="uk-modal-close-default" type="button" uk-close style="margin-left: 8px; flex-shrink: 0;"></button>
     </div>
 
-    <div id="modal-nova-tarefa" uk-modal>
-        <div class="uk-modal-dialog uk-modal-body uk-card-default redondo">
-            <button class="uk-modal-close-default" type="button" uk-close></button>
-            <h2 class="uk-modal-title uk-text-bold">Nova Tarefa</h2>
-            <form id="formNovaTarefa" action="javascript:void(0);">
-                <div class="uk-margin">
-                    <label class="uk-form-label">Colaborador</label>
-                    <select id="newTaskAssignee" class="uk-select redondo" required>
-                        <option value="">Selecione o colaborador...</option>
-                    </select>
-                </div>
-                <div class="uk-margin">
-                    <label class="uk-form-label">Descrição</label>
-                    <textarea id="newTaskDescription" class="uk-textarea redondo" rows="3"
-                        placeholder="Descrição da tarefa (mín. 5 caracteres)" required minlength="5"></textarea>
-                </div>
-                <div class="uk-margin">
-                    <label class="uk-form-label">Data Limite</label>
-                    <input id="newTaskDueDate" class="uk-input redondo" type="date" required>
-                </div>
-                <div class="uk-margin-top uk-text-right">
-                    <button class="uk-button uk-button-default uk-modal-close redondo" type="button">Cancelar</button>
-                    <button id="btnSalvarTarefa" class="uk-button uk-button-primary redondo" type="button">Criar
-                        Tarefa</button>
-                </div>
-            </form>
+    <div class="leve-modal-body" style="padding-top: 16px;">
+      <div class="leve-form-section" style="margin-top: 0;">Informações de contato</div>
+      <div class="leve-perfil-grid">
+        <div class="leve-perfil-field">
+          <label>Celular</label>
+          <p id="perfilMobile">—</p>
         </div>
+        <div class="leve-perfil-field">
+          <label>Telefone Fixo</label>
+          <p id="perfilLandline">—</p>
+        </div>
+        <div class="leve-perfil-field" style="grid-column: 1 / -1;">
+          <label>Endereço</label>
+          <p id="perfilAddress">—</p>
+        </div>
+        <div class="leve-perfil-field">
+          <label>Data de Nascimento</label>
+          <p id="perfilBirthDate" class="leve-mono">—</p>
+        </div>
+      </div>
     </div>
 
-    <div id="modal-editar-tarefa" uk-modal>
-        <div class="uk-modal-dialog uk-modal-body uk-card-default redondo">
-            <button class="uk-modal-close-default" type="button" uk-close></button>
-            <h2 class="uk-modal-title uk-text-bold">Editar Tarefa</h2>
-            <form id="formEditarTarefa" action="javascript:void(0);">
-                <input id="editTaskId" type="hidden">
-                <div class="uk-margin">
-                    <label class="uk-form-label">Colaborador</label>
-                    <select id="editTaskAssignee" class="uk-select redondo" required>
-                        <option value="">Selecione o colaborador...</option>
-                    </select>
-                </div>
-                <div class="uk-margin">
-                    <label class="uk-form-label">Descrição</label>
-                    <textarea id="editTaskDescription" class="uk-textarea redondo" rows="3" required
-                        minlength="5"></textarea>
-                </div>
-                <div class="uk-margin">
-                    <label class="uk-form-label">Data Limite</label>
-                    <input id="editTaskDueDate" class="uk-input redondo" type="date" required>
-                </div>
-                <div class="uk-margin-top uk-text-right">
-                    <button class="uk-button uk-button-default uk-modal-close redondo" type="button">Cancelar</button>
-                    <button id="btnSalvarEdicao" class="uk-button uk-button-primary redondo" type="button">Salvar
-                        Alterações</button>
-                </div>
-            </form>
-        </div>
+    <div class="leve-modal-footer" style="justify-content: space-between;">
+      <span style="font-size: 0.72rem; color: var(--text-dim);">LEVE Ops · Dados internos</span>
+      <button class="uk-button uk-button-default uk-button-small uk-modal-close" type="button">Fechar</button>
     </div>
-    <div id="modal-perfil" uk-modal>
-        <div class="uk-modal-dialog uk-modal-body uk-card-default redondo">
-            <button class="uk-modal-close-default" type="button" uk-close></button>
-            <div class="uk-flex uk-flex-middle" style="gap: 16px;">
-                <div>
-                    <img id="perfilFoto"
-                        style="width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-color); display:none;">
-                    <div id="perfilFotoPlaceholder"
-                        style="width: 72px; height: 72px; border-radius: 50%; background: var(--border-color); display:flex; align-items:center; justify-content:center;">
-                        <span uk-icon="icon: user; ratio: 2"></span>
-                    </div>
-                </div>
-                <div>
-                    <h3 class="uk-margin-remove uk-text-bold" id="perfilNome"></h3>
-                    <p class="uk-text-muted uk-margin-remove" id="perfilEmail"></p>
-                    <span id="perfilBadge" class="uk-badge" style="margin-top: 6px;"></span>
-                </div>
-            </div>
-            <hr style="border-color: var(--border-color);">
-            <div uk-grid class="uk-grid-small">
-                <div class="uk-width-1-2@s">
-                    <p class="uk-text-muted uk-margin-remove" style="font-size:0.75rem;">CELULAR</p>
-                    <p class="uk-margin-remove" id="perfilMobile"></p>
-                </div>
-                <div class="uk-width-1-2@s">
-                    <p class="uk-text-muted uk-margin-remove" style="font-size:0.75rem;">TELEFONE FIXO</p>
-                    <p class="uk-margin-remove" id="perfilLandline"></p>
-                </div>
-                <div class="uk-width-1-1">
-                    <p class="uk-text-muted uk-margin-remove" style="font-size:0.75rem;">ENDEREÇO</p>
-                    <p class="uk-margin-remove" id="perfilAddress"></p>
-                </div>
-                <div class="uk-width-1-2@s">
-                    <p class="uk-text-muted uk-margin-remove" style="font-size:0.75rem;">DATA DE NASCIMENTO</p>
-                    <p class="uk-margin-remove" id="perfilBirthDate"></p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/uikit@3.17.11/dist/js/uikit.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/uikit@3.17.11/dist/js/uikit-icons.min.js"></script>
-    <script type="module" src="/dist/pages/dashboard/dashboard.js"></script>
+
+  </div>
+</div>
+
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.17.11/dist/js/uikit.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/uikit@3.17.11/dist/js/uikit-icons.min.js"></script>
+<script type="module" src="/dist/pages/dashboard/dashboard.js"></script>
+
+<!-- Helpers UI (não tocam em TS) -->
+<script>
+  // Avatar com inicial do nome na navbar
+  document.addEventListener('DOMContentLoaded', function () {
+
+    // Data no header
+    const dateEl = document.getElementById('headerDate');
+    if (dateEl) {
+      const now = new Date();
+      const dia = now.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      dateEl.innerHTML = dia.charAt(0).toUpperCase() + dia.slice(1);
+    }
+
+    // Subtitle dinâmico
+    const userRaw = localStorage.getItem('@Leve:user');
+    if (userRaw) {
+      try {
+        const user = JSON.parse(userRaw);
+        const subtitle = document.getElementById('pageSubtitle');
+        if (subtitle) {
+          subtitle.textContent = user.isManager
+            ? 'Visão gerencial · Todas as tarefas da equipe'
+            : `Olá, ${user.fullName.split(' ')[0]} · Suas tarefas atribuídas`;
+        }
+
+        // Avatar
+        const navAvatar = document.getElementById('navAvatar');
+        if (navAvatar && user.fullName) {
+          const initials = user.fullName.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+          navAvatar.textContent = initials;
+        }
+
+        // Card de equipe só para gestor
+        if (user.isManager) {
+          const teamCard = document.getElementById('statTeamCard');
+          if (teamCard) teamCard.style.display = '';
+        }
+
+        // Badge de perfil no modal
+        const badge = document.getElementById('perfilBadge');
+        if (badge) {
+          if (user.isManager) {
+            badge.className = 'leve-role-badge leve-role-badge--manager';
+            badge.textContent = '⭐ Gestor';
+          } else {
+            badge.className = 'leve-role-badge leve-role-badge--staff';
+            badge.textContent = 'Colaborador';
+          }
+        }
+
+      } catch (e) {}
+    }
+
+    // Label do upload de foto
+    const photoInput = document.getElementById('newUserPhoto');
+    const photoLabel = document.getElementById('photoLabel');
+    if (photoInput && photoLabel) {
+      photoInput.addEventListener('change', function () {
+        if (this.files && this.files[0]) {
+          photoLabel.textContent = this.files[0].name;
+        }
+      });
+    }
+  });
+
+  // Atualiza stats depois que o TS renderizar
+  // O TS popula #tasksGridContainer → interceptamos via MutationObserver
+  (function () {
+    const observer = new MutationObserver(function () {
+      const rows = document.querySelectorAll('#tasksGridContainer tbody tr');
+      const total   = rows.length;
+      const pending = [...rows].filter(r => r.querySelector('.status-pendente')).length;
+      const done    = total - pending;
+
+      const el = (id) => document.getElementById(id);
+      if (el('statTotal'))   el('statTotal').textContent   = total;
+      if (el('statPending')) el('statPending').textContent = pending;
+      if (el('statDone'))    el('statDone').textContent    = done;
+      if (el('taskCount'))   el('taskCount').textContent   = total;
+
+      // Colaboradores (para gestor: conta assignees únicos)
+      const assignees = new Set([...rows].map(r => {
+        const cells = r.querySelectorAll('td');
+        return cells[1] ? cells[1].textContent.trim() : null;
+      }).filter(Boolean));
+      if (el('statTeam')) el('statTeam').textContent = assignees.size || '—';
+    });
+
+    const waitForContainer = setInterval(function () {
+      const container = document.getElementById('tasksGridContainer');
+      if (container) {
+        clearInterval(waitForContainer);
+        observer.observe(container, { childList: true, subtree: true });
+      }
+    }, 100);
+  })();
+</script>
+
 </body>
-
 </html>

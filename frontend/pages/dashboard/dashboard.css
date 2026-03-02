@@ -1,50 +1,251 @@
+/* ═══════════════════════════════════════════════════════
+   LEVE OPS — Dashboard
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Navbar ── */
 .uk-navbar-container {
-    padding: 0 20px;
-    border-bottom: 1px solid var(--border-color);
+    height: 60px;
+    padding: 0 24px;
 }
-
-.uk-table th {
-    text-transform: uppercase;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    color: var(--primary-color) !important;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.uk-table td {
-    vertical-align: middle;
+.leve-logo-text {
+    font-size: 1.1rem;
+    font-weight: 900;
+    letter-spacing: -0.03em;
     color: var(--text-main);
-    border-bottom: 1px solid var(--border-color);
+}
+.leve-logo-text span { color: var(--gold); }
+
+.leve-logo-dot {
+    width: 6px; height: 6px;
+    border-radius: var(--radius-pill);
+    background: var(--gold);
+    display: inline-block;
+    margin-bottom: 2px;
+    animation: pulse 2s infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.5; transform: scale(0.8); }
 }
 
-.status-badge {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.7rem;
+/* Separador navbar */
+.leve-nav-sep {
+    width: 1px;
+    height: 20px;
+    background: var(--border-mid);
+    margin: 0 8px;
+}
+
+/* ── Page header ── */
+.leve-page-header {
+    padding: 28px 0 20px;
+}
+.leve-page-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text-main);
+    line-height: 1.2;
+}
+.leve-page-sub {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+/* ── Action buttons area ── */
+.leve-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.leve-btn-icon {
+    width: 36px; height: 36px;
+    border-radius: var(--radius-xs);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-card-2);
+    border: 1px solid var(--border-mid);
+    color: var(--text-sub);
+    cursor: pointer;
+    transition: var(--t);
+}
+.leve-btn-icon:hover {
+    background: var(--gold-dim);
+    border-color: var(--gold-border);
+    color: var(--gold);
+}
+
+/* ── Tabela ── */
+.leve-table-header {
+    padding: 14px 20px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.leve-table-title {
+    font-size: 0.82rem;
     font-weight: 700;
+    color: var(--text-sub);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.leve-count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 18px;
+    padding: 0 6px;
+    border-radius: var(--radius-pill);
+    background: var(--gold-dim);
+    border: 1px solid var(--gold-border);
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--gold);
+    letter-spacing: 0.02em;
+}
+
+/* Mini avatar na tabela */
+.leve-mini-avatar {
+    width: 28px; height: 28px;
+    border-radius: var(--radius-pill);
+    background: linear-gradient(135deg, var(--navy-600), var(--navy-500));
+    border: 1px solid var(--gold-border);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--gold-light);
+    flex-shrink: 0;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+/* Coluna de prazo */
+.leve-due-date { font-family: 'DM Mono', monospace; font-size: 0.82rem; }
+.leve-due-date.overdue { color: var(--danger) !important; }
+
+/* Linha pointer para gestor */
+.leve-clickable-row { cursor: pointer; }
+.leve-clickable-row:hover td:first-child { color: var(--gold-light) !important; }
+
+/* ── Modal refinado ── */
+.uk-modal-dialog {
+    padding: 0 !important;
+}
+.leve-modal-body {
+    padding: 20px 24px 24px;
+}
+.leve-modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    background: rgba(6,12,23,0.3);
+    border-radius: 0 0 var(--radius) var(--radius);
+}
+
+/* Modal perfil */
+.leve-perfil-avatar-wrap {
+    width: 72px; height: 72px;
+    border-radius: var(--radius-pill);
+    border: 2px solid var(--gold-border);
+    background: linear-gradient(135deg, var(--navy-600), var(--navy-700));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--gold-light);
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 4px var(--gold-dim);
+}
+.leve-perfil-avatar-wrap img {
+    width: 100%; height: 100%; object-fit: cover;
+}
+
+/* Tipo gestor/colaborador badge */
+.leve-role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: var(--radius-pill);
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
 }
-
-.status-pendente {
-    background-color: rgba(234, 179, 8, 0.15);
-    color: #facc15;
-    border: 1px solid rgba(234, 179, 8, 0.3);
+.leve-role-badge--manager {
+    background: var(--gold-dim);
+    border: 1px solid var(--gold-border);
+    color: var(--gold);
+}
+.leve-role-badge--staff {
+    background: var(--blue-dim);
+    border: 1px solid rgba(59,130,246,0.3);
+    color: var(--blue-light);
 }
 
-.status-concluida {
-    background-color: rgba(34, 197, 94, 0.15);
-    color: #4ade80;
-    border: 1px solid rgba(34, 197, 94, 0.3);
+/* Form section label */
+.leve-form-section {
+    font-size: 0.68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    margin: 16px 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.leve-form-section::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
 }
 
+/* ── Upload foto ── */
+.leve-photo-upload {
+    border: 1.5px dashed var(--border-mid);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--t);
+    background: rgba(6,12,23,0.4);
+}
+.leve-photo-upload:hover {
+    border-color: var(--gold-border);
+    background: var(--gold-dim);
+}
+.leve-photo-preview {
+    width: 60px; height: 60px;
+    border-radius: var(--radius-pill);
+    object-fit: cover;
+    border: 2px solid var(--gold-border);
+    box-shadow: 0 0 0 3px var(--gold-dim);
+    display: none;
+}
+
+/* ── Responsivo ── */
 @media (max-width: 640px) {
-    .uk-navbar-item.uk-logo {
-        font-size: 1.2rem;
-    }
-
-    .uk-table th:nth-child(3),
-    .uk-table td:nth-child(3) {
-        display: none;
-    }
+    .leve-page-header { padding: 20px 0 14px; }
+    .leve-page-title  { font-size: 1.1rem; }
+    .leve-actions .uk-button span { display: none; }
+    .leve-modal-body  { padding: 16px; }
+    .leve-modal-footer { padding: 12px 16px; }
+    .leve-stats { grid-template-columns: 1fr 1fr; }
 }
