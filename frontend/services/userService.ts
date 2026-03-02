@@ -5,6 +5,9 @@ export interface User {
     fullName: string;
     email: string;
     mobile: string;
+    landline?: string | null;
+    address?: string;
+    birthDate?: string;
     isManager: boolean;
     createdAt: string;
 }

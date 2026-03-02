@@ -18,7 +18,7 @@
         <div class="uk-navbar-right">
             <ul class="uk-navbar-nav">
                 <li>
-                    <a href="#">
+                    <a href="#" id="perfilBtn">
                         <span uk-icon="icon: user; ratio: 0.9" class="uk-margin-small-right"></span>
                         <span id="userNameDisplay"></span>
                     </a>
@@ -115,8 +115,8 @@
                                 <button class="uk-button uk-button-default redondo" type="button">
                                     <span uk-icon="icon: upload"></span> Escolher foto
                                 </button>
-                                  <input id="newUserPhotoLabel" class="uk-input redondo uk-margin-small-left" type="text"
-                                placeholder="Nenhum arquivo selecionado" readonly style="width: auto;">
+                                <input id="newUserPhotoLabel" class="uk-input redondo uk-margin-small-left" type="text"
+                                    placeholder="Nenhum arquivo selecionado" readonly style="width: auto;">
                             </div>
                         </div>
                     </div>
@@ -192,7 +192,45 @@
             </form>
         </div>
     </div>
-
+    <div id="modal-perfil" uk-modal>
+        <div class="uk-modal-dialog uk-modal-body uk-card-default redondo">
+            <button class="uk-modal-close-default" type="button" uk-close></button>
+            <div class="uk-flex uk-flex-middle" style="gap: 16px;">
+                <div>
+                    <img id="perfilFoto"
+                        style="width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-color); display:none;">
+                    <div id="perfilFotoPlaceholder"
+                        style="width: 72px; height: 72px; border-radius: 50%; background: var(--border-color); display:flex; align-items:center; justify-content:center;">
+                        <span uk-icon="icon: user; ratio: 2"></span>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="uk-margin-remove uk-text-bold" id="perfilNome"></h3>
+                    <p class="uk-text-muted uk-margin-remove" id="perfilEmail"></p>
+                    <span id="perfilBadge" class="uk-badge" style="margin-top: 6px;"></span>
+                </div>
+            </div>
+            <hr style="border-color: var(--border-color);">
+            <div uk-grid class="uk-grid-small">
+                <div class="uk-width-1-2@s">
+                    <p class="uk-text-muted uk-margin-remove" style="font-size:0.75rem;">CELULAR</p>
+                    <p class="uk-margin-remove" id="perfilMobile"></p>
+                </div>
+                <div class="uk-width-1-2@s">
+                    <p class="uk-text-muted uk-margin-remove" style="font-size:0.75rem;">TELEFONE FIXO</p>
+                    <p class="uk-margin-remove" id="perfilLandline"></p>
+                </div>
+                <div class="uk-width-1-1">
+                    <p class="uk-text-muted uk-margin-remove" style="font-size:0.75rem;">ENDEREÇO</p>
+                    <p class="uk-margin-remove" id="perfilAddress"></p>
+                </div>
+                <div class="uk-width-1-2@s">
+                    <p class="uk-text-muted uk-margin-remove" style="font-size:0.75rem;">DATA DE NASCIMENTO</p>
+                    <p class="uk-margin-remove" id="perfilBirthDate"></p>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.17.11/dist/js/uikit.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.17.11/dist/js/uikit-icons.min.js"></script>
     <script type="module" src="/dist/pages/dashboard/dashboard.js"></script>

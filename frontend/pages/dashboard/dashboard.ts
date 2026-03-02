@@ -15,6 +15,7 @@ if (!token || !userRaw) {
 
     document.addEventListener('DOMContentLoaded', async () => {
         const userNameDisplay = document.getElementById('userNameDisplay');
+
         if (userNameDisplay) userNameDisplay.innerText = user.fullName;
 
         if (user.isManager) {
@@ -24,7 +25,7 @@ if (!token || !userRaw) {
             await setupTaskModal();
             setupEditTaskModal();
         }
-
+        await setupPerfilModal(user);
         await renderTasks(user.isManager);
 
         document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
@@ -362,5 +363,38 @@ function fileToBase64(file: File): Promise<string> {
             img.src = e.target!.result as string;
         };
         reader.readAsDataURL(file);
+    });
+}
+
+async function setupPerfilModal(user: AuthUser) {
+    const btn = document.getElementById('perfilBtn');
+
+    btn?.addEventListener('click', async (e) => {
+        e.preventDefault();
+
+        try {
+            const users = await loadUsers();
+            const fullUser = users.find(u => u.id === user.id);
+
+            (document.getElementById('perfilNome') as HTMLElement).innerText = user.fullName;
+            (document.getElementById('perfilEmail') as HTMLElement).innerText = user.email;
+            (document.getElementById('perfilBadge') as HTMLElement).innerText = user.isManager ? 'Gestor' : 'Colaborador';
+            (document.getElementById('perfilBadge') as HTMLElement).style.background = user.isManager ? 'var(--primary-color)' : 'var(--border-color)';
+            (document.getElementById('perfilMobile') as HTMLElement).innerText = fullUser?.mobile ?? '—';
+            (document.getElementById('perfilLandline') as HTMLElement).innerText = fullUser?.landline ?? '—';
+            (document.getElementById('perfilAddress') as HTMLElement).innerText = fullUser?.address ?? '—';
+            (document.getElementById('perfilBirthDate') as HTMLElement).innerText = fullUser?.birthDate
+                ? new Date(fullUser.birthDate).toLocaleDateString('pt-BR', { timeZone: 'UTC' })
+                : '—';
+
+        } catch {
+            UIkit.notification({
+                message: `<span uk-icon='icon: warning'></span> Erro ao carregar perfil.`,
+                status: 'danger',
+                pos: 'top-right'
+            });
+        }
+
+        UIkit.modal('#modal-perfil').show();
     });
 }
