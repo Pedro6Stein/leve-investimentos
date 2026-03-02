@@ -1,6 +1,6 @@
 ﻿declare const UIkit: any;
 import { loadMyTasks, loadManagedTasks, createTask, completeTask, updateTask, Task } from '../../services/taskService.js';
-import { loadUsers, createUser } from '../../services/userService.js';
+import { loadUsers, createUser, loadMe } from '../../services/userService.js';
 import { AuthUser } from '../../services/authService.js';
 import { DataGrid } from '../../shared/components/DataGrid.js';
 import { HttpError } from '../../services/httpClient.js';
@@ -367,102 +367,92 @@ function fileToBase64(file: File): Promise<string> {
 }
 
 async function setupPerfilModal(user: AuthUser) {
-  const btn = document.getElementById('perfilBtn');
+    const btn = document.getElementById('perfilBtn');
 
-  // Helper: escreve "—" se vier vazio/null
-  const setText = (el: HTMLElement, value: any) => {
-    const v = typeof value === 'string' ? value.trim() : value;
-    el.innerText = v ? String(v) : '—';
-  };
+    const setText = (el: HTMLElement, value: any) => {
+        const v = typeof value === 'string' ? value.trim() : value;
+        el.innerText = v ? String(v) : '—';
+    };
 
-  // Helper: normaliza src de foto (dataURL completo OU base64 puro)
-  const normalizePhotoSrc = (raw: string) => {
-    const v = raw.trim();
+    const normalizePhotoSrc = (raw: string) => {
+        const v = raw.trim();
+        if (v.startsWith('data:image/')) return v;
+        if (v.startsWith('base64,')) return `data:image/jpeg;${v}`;
+        return `data:image/jpeg;base64,${v}`;
+    };
 
-    // Já é um dataURL completo
-    if (v.startsWith('data:image/')) return v;
+    btn?.addEventListener('click', async (e) => {
+        e.preventDefault();
 
-    // Caso venha com "base64," mas sem o prefixo completo
-    if (v.startsWith('base64,')) return `data:image/jpeg;${v}`;
+        const perfilNome = document.getElementById('perfilNome') as HTMLElement;
+        const perfilEmail = document.getElementById('perfilEmail') as HTMLElement;
+        const perfilBadge = document.getElementById('perfilBadge') as HTMLElement;
 
-    // Caso venha só o base64 puro
-    return `data:image/jpeg;base64,${v}`;
-  };
+        const perfilMobile = document.getElementById('perfilMobile') as HTMLElement;
+        const perfilLandline = document.getElementById('perfilLandline') as HTMLElement;
+        const perfilAddress = document.getElementById('perfilAddress') as HTMLElement;
+        const perfilBirthDate = document.getElementById('perfilBirthDate') as HTMLElement;
 
-  btn?.addEventListener('click', async (e) => {
-    e.preventDefault();
+        const perfilFoto = document.getElementById('perfilFoto') as HTMLImageElement;
+        const perfilPlaceholder = document.getElementById('perfilFotoPlaceholder') as HTMLElement;
 
-    const perfilNome = document.getElementById('perfilNome') as HTMLElement;
-    const perfilEmail = document.getElementById('perfilEmail') as HTMLElement;
-    const perfilBadge = document.getElementById('perfilBadge') as HTMLElement;
+        // Básicos (sempre)
+        perfilNome.innerText = user.fullName;
+        perfilEmail.innerText = user.email;
 
-    const perfilMobile = document.getElementById('perfilMobile') as HTMLElement;
-    const perfilLandline = document.getElementById('perfilLandline') as HTMLElement;
-    const perfilAddress = document.getElementById('perfilAddress') as HTMLElement;
-    const perfilBirthDate = document.getElementById('perfilBirthDate') as HTMLElement;
+        const isManager = user.isManager === true;
+        perfilBadge.innerText = isManager ? 'Gestor' : 'Colaborador';
+        perfilBadge.style.background = isManager ? 'var(--primary-color)' : 'var(--border-color)';
 
-    const perfilFoto = document.getElementById('perfilFoto') as HTMLImageElement;
-    const perfilPlaceholder = document.getElementById('perfilFotoPlaceholder') as HTMLElement;
+        // Defaults
+        perfilMobile.innerText = '—';
+        perfilLandline.innerText = '—';
+        perfilAddress.innerText = '—';
+        perfilBirthDate.innerText = '—';
 
-    // Sempre mostra o básico
-    perfilNome.innerText = user.fullName;
-    perfilEmail.innerText = user.email;
-
-    perfilBadge.innerText = user.isManager ? 'Gestor' : 'Colaborador';
-    perfilBadge.style.background = user.isManager ? 'var(--primary-color)' : 'var(--border-color)';
-
-    // Default: colaborador vê extras vazios sem erro
-    perfilMobile.innerText = '—';
-    perfilLandline.innerText = '—';
-    perfilAddress.innerText = '—';
-    perfilBirthDate.innerText = '—';
-
-    perfilFoto.style.display = 'none';
-    perfilPlaceholder.style.display = 'flex';
-
-    // Colaborador: NÃO chama /users (evita 403)
-    if (!user.isManager) {
-      UIkit.modal('#modal-perfil').show();
-      return;
-    }
-
-    // Gestor: busca dados completos via /users
-    try {
-      const users = await loadUsers();
-      const fullUser = users.find((u) => u.id === user.id);
-
-      setText(perfilMobile, fullUser?.mobile);
-      setText(perfilLandline, fullUser?.landline);
-      setText(perfilAddress, fullUser?.address);
-
-      perfilBirthDate.innerText = fullUser?.birthDate
-        ? new Date(fullUser.birthDate).toLocaleDateString('pt-BR', { timeZone: 'UTC' })
-        : '—';
-
-      if (fullUser?.photo) {
-        const src = normalizePhotoSrc(fullUser.photo);
-
-        // DIAGNÓSTICO
-        // console.log('[perfil] raw photo:', fullUser.photo.slice(0, 40));
-        // console.log('[perfil] normalized src:', src.slice(0, 40));
-
-        perfilFoto.src = src;
-        perfilFoto.style.display = 'block';
-        perfilPlaceholder.style.display = 'none';
-      } else {
         perfilFoto.style.display = 'none';
         perfilPlaceholder.style.display = 'flex';
-      }
-    } catch {
-      // Sem notificação (modal deve abrir “bonito” mesmo se falhar)
-      perfilMobile.innerText = '—';
-      perfilLandline.innerText = '—';
-      perfilAddress.innerText = '—';
-      perfilBirthDate.innerText = '—';
-      perfilFoto.style.display = 'none';
-      perfilPlaceholder.style.display = 'flex';
-    }
 
-    UIkit.modal('#modal-perfil').show();
-  });
+        try {
+            if (isManager) {
+                // Gestor: dados completos via /users (manager-only)
+                const users = await loadUsers();
+                const fullUser = users.find((u) => u.id === user.id);
+
+                setText(perfilMobile, fullUser?.mobile);
+                setText(perfilLandline, fullUser?.landline);
+                setText(perfilAddress, fullUser?.address);
+
+                perfilBirthDate.innerText = fullUser?.birthDate
+                    ? new Date(fullUser.birthDate).toLocaleDateString('pt-BR', { timeZone: 'UTC' })
+                    : '—';
+
+                if (fullUser?.photo) {
+                    perfilFoto.src = normalizePhotoSrc(fullUser.photo);
+                    perfilFoto.style.display = 'block';
+                    perfilPlaceholder.style.display = 'none';
+                }
+            } else {
+                const me = await loadMe();
+                setText(perfilMobile, me.mobile);
+                setText(perfilLandline, me.landline);
+                setText(perfilAddress, me.address);
+
+                perfilBirthDate.innerText = me.birthDate
+                    ? new Date(me.birthDate).toLocaleDateString('pt-BR', { timeZone: 'UTC' })
+                    : '—';
+
+                if (me.photo) {
+                    perfilFoto.src = normalizePhotoSrc(me.photo);
+                    perfilFoto.style.display = 'block';
+                    perfilPlaceholder.style.display = 'none';
+                }
+            }
+        } catch {
+            perfilFoto.style.display = 'none';
+            perfilPlaceholder.style.display = 'flex';
+        }
+
+        UIkit.modal('#modal-perfil').show();
+    });
 }
