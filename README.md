@@ -1,79 +1,158 @@
-# 🚀 LEVE Ops - Sistema de Gestão Operacional
+Perfeito, Pedro! Limpei todas aquelas quebras de linha estranhas ("Fragmento de código", "Bash") que ficam quando a gente copia e cola, e já juntei com a **sua versão final** (com o Docker como Bônus e o `.env` de produção com a instrução da senha no e-mail).
 
-Este repositório contém a solução desenvolvida para o desafio técnico da **LEVE Investimentos**. O sistema é uma plataforma completa para gestão operacional, focado em gerenciar equipes (gestores e subordinados) e o ciclo de vida de tarefas, com notificações automatizadas por e-mail.
+Ficou lindo, profissional e pronto para ir direto para o seu repositório.
 
-## 🏗️ Arquitetura do Projeto (Monorepo)
+Basta clicar em **"Copiar código"** (no canto superior direito do bloco abaixo) e colar no seu arquivo `README.md`:
 
-O projeto foi estruturado no formato **Monorepo** para manter o código organizado e facilitar a avaliação:
+```markdown
+# ⚡ LEVE Ops — Sistema de Gestão Operacional
 
-- 📁 **/backend**: API RESTful construída com **Node.js, TypeScript e Express**.
-- 📁 **/frontend**: Interface de usuário (UI) consumindo a API.
+![Banner do Projeto](./docs/banner.png)
+> Projeto desenvolvido como Desafio Técnico para a vaga de Desenvolvedor na **LEVE Investimentos**.
 
-## ✨ Principais Funcionalidades (Back-end)
-
-- **Autenticação Segura:** Login baseado em tokens **JWT** com senhas criptografadas via **Bcrypt**.
-- **Controle de Acesso (RBAC):** Rotas protegidas por middlewares que diferenciam "Gestores" de "Subordinados".
-- **Gestão de Tarefas:** Atribuição de demandas com prazo limite de execução.
-- **Notificações Inteligentes:** - Disparo de e-mail ao subordinado quando uma tarefa é atribuída (Gestor em Cópia).
-  - Disparo de e-mail ao gestor quando a tarefa é concluída.
-- **Validação Rigorosa:** Uso do **Zod** para validar dados na entrada da API.
+O **LEVE Ops** é um sistema web interno focado na gestão de tarefas para o setor operacional. Ele permite que gestores atribuam tarefas, acompanhem prazos e automatizem o fluxo de trabalho com notificações em tempo real via e-mail.
 
 ---
 
-## 🛠️ Como Executar o Projeto Localmente
+## 🚀 Funcionalidades Principais (O que foi entregue)
 
-### 1. Pré-requisitos
-- **Node.js** (v18 ou superior)
-- **SQL Server** (Pode ser uma instância local na sua máquina ou via Docker).
+- **Autenticação Segura:** Login via JWT com controle estrito de rotas e expiração de sessão.
+- **Controle de Acesso (RBAC):** Separação total de privilégios entre *Gestores* (podem criar usuários e tarefas) e *Colaboradores* (apenas visualizam e concluem suas demandas).
+- **Gestão de Tarefas Completa:** Criação, edição e acompanhamento de status com validação de datas (não permite datas retroativas).
+- **Notificações Automáticas (E-mail):** Integração com Nodemailer para disparo de e-mails transacionais em eventos chave (Nova tarefa, Tarefa editada, Tarefa concluída).
+- **Dashboard Dinâmico:** Interface reativa construída com UIKit, com cards de estatísticas que atualizam em tempo real.
+- **Processamento de Imagens:** Upload de foto de perfil com compressão automática em Base64 no lado do cliente.
 
-### 2. Clonando o Repositório
+---
+
+## 🛠️ Decisões Arquiteturais e Stack Tecnológica
+
+O projeto foi dividido em uma arquitetura limpa (Backend RESTful + Frontend Single Page App), focando em **Clean Code** e princípios **SOLID**.
+
+**Back-end:**
+- **Node.js + Express + TypeScript:** Estrutura base da API, separada em *Controllers*, *Services* e *Routes*.
+- **Prisma ORM:** Abstração segura e tipada para o banco de dados.
+- **SQL Server (Docker):** Banco de dados relacional robusto rodando em container para garantir padronização do ambiente.
+- **Zod:** Validação rigorosa dos dados de entrada nas rotas.
+- **JWT & Bcrypt:** Segurança de dados e senhas.
+
+**Front-end:**
+- **TypeScript Vanilla:** Escolhido para demonstrar domínio real da linguagem e do DOM, criando *wrappers* genéricos (`HttpClient`, `DataGrid`) sem depender de frameworks pesados.
+- **UIKit CSS:** Framework exigido nos requisitos, customizado com variáveis CSS para criar um "Design System" com a paleta institucional (Navy & Gold).
+
+---
+
+## 📸 Fluxo do Sistema (Screenshots)
+
+### 1. Autenticação e Redirecionamento
+![Tela de Login](./docs/login.png)
+
+### 2. Visão do Gestor (Dashboard & Stats)
+*Gestores têm acesso a estatísticas da equipe, criação de usuários e edição de tarefas.*
+![Dashboard Gestor](./docs/dashboard-gestor.png)
+
+### 3. Visão do Colaborador
+*Visão limpa focada apenas na execução e conclusão das tarefas.*
+![Dashboard Colaborador](./docs/dashboard-colaborador.png)
+
+### 4. Notificações por E-mail (Extra entregue!)
+*Exemplo de e-mail disparado via SMTP quando uma tarefa é atribuída ou finalizada.*
+![Exemplos de E-mail](./docs/email-notifications.png)
+
+---
+
+## ⚙️ Como Executar o Projeto Localmente
+
+### Pré-requisitos
+- **Node.js** (v18+)
+- **Git**
+- **Docker e Docker Compose** (Recomendado para o banco de dados)
+
+### Passo 1: Clonar o Repositório
 ```bash
-git clone https://github.com/Pedro6Stein/leve-investimentos.git
-cd leve-investimentos/backend
-3. Configuração das Variáveis de Ambiente (.env)
-Como este é um projeto de avaliação técnica e o banco de dados é executado localmente, as credenciais foram deixadas explícitas para facilitar o setup. Crie um arquivo chamado .env na raiz da pasta backend/ e cole o conteúdo abaixo:
+git clone [https://github.com/SEU_USUARIO/leve-investimentos.git](https://github.com/SEU_USUARIO/leve-investimentos.git)
+cd leve-investimentos
 
-Fragmento do código
+```
+
+### Passo 2: Configurar o Banco de Dados (Docker - ⭐ BÔNUS)
+
+*Para garantir a padronização e facilitar a execução, a infraestrutura do SQL Server foi dockerizada como um diferencial técnico do projeto.*
+
+Levante o container do SQL Server em segundo plano executando:
+
+```bash
+docker compose up -d
+
+```
+
+*Aguarde cerca de 30 segundos para o container realizar o healthcheck e ficar pronto para conexões.*
+
+### Passo 3: Configurar as Variáveis de Ambiente
+
+Crie um arquivo `.env` na raiz do projeto (onde fica o `package.json`) com a seguinte estrutura:
+
+```env
 DATABASE_URL="sqlserver://localhost:1433;database=LeveDB;user=sa;password=LevePassword123!;encrypt=true;trustServerCertificate=true"
 JWT_SECRET="super_secret_jwt_key_leve_2026"
 PORT=3333
-4. Configuração do Banco de Dados (Infraestrutura)
-Você tem duas opções para o banco de dados SQL Server:
+NODE_ENV="production"
+EMAIL_USER="enviataskleve@gmail.com"
+EMAIL_PASS= (A senha foi enviada em anexo no email, por favor verificar para o email funcionar)
 
-Opção A: Usando o Docker (Recomendado/Mais rápido)
-O projeto inclui um arquivo docker-compose.yml já configurado com a senha correspondente ao .env. Basta rodar:
+```
 
-Bash
-docker-compose up -d
-Opção B: Usando o seu SQL Server Local
-Se não quiser usar o Docker, basta garantir que o seu SQL Server esteja rodando e usar a mesma string de conexão fornecida no passo 3.
+### Passo 4: Instalar e Iniciar o Back-end
 
-5. Instalação, Modelagem e População do Banco
-A modelagem e a população do banco de dados são gerenciadas de forma automatizada e segura pelo Prisma ORM.
+Com o banco rodando e o `.env` configurado, instale as dependências, rode as migrações e popule o banco inicial:
 
-No terminal, dentro da pasta /backend, execute sequencialmente:
-
-Bash
-# Instala todas as dependências do projeto
+```bash
 npm install
-
-# Cria as tabelas e a modelagem do banco de dados (Equivalente ao Script de Modelagem)
-npx prisma migrate dev --name init
-
-# Popula o banco com os dados iniciais exigidos (Equivalente ao Script de População)
+npx prisma generate
+npx prisma migrate deploy
 npm run seed
-6. Iniciando a Aplicação
-Com o banco pronto, inicie o servidor:
 
-Bash
-npm run dev
-A API estará escutando as requisições em http://localhost:3333.
+```
 
-🔑 Credenciais de Acesso Inicial
-Após rodar o comando de população (npm run seed), utilize as seguintes credenciais no Frontend ou no Insomnia/Postman para realizar o primeiro login no sistema como Gestor:
+Em seguida, compile e inicie a API:
 
-E-mail: ti@leveinvestimentos.com.br
+```bash
+npm run build
+npm start
 
-Senha: teste123
+```
 
-Desenvolvido com ☕ e dedicação por Pedro Stein
+*(Para ambiente de desenvolvimento, utilize `npm run dev`).*
+
+### Passo 5: Rodar o Front-end
+
+Abra um novo terminal e compile o TypeScript:
+
+```bash
+npx tsc -w
+
+```
+
+Sirva os arquivos estáticos na raiz do projeto (utilizando a extensão Live Server do VS Code, ou rodando um pacote como `serve`):
+
+```bash
+npx serve . -p 3000
+
+```
+
+*Acesse o sistema em `http://localhost:3000`.*
+
+---
+
+## 🔑 Credenciais Padrão (Seed)
+
+Para avaliar o sistema, utilize o usuário gestor criado automaticamente pelo comando `seed`:
+
+* **E-mail:** `ti@leveinvestimentos.com.br`
+* **Senha:** `teste123`
+
+---
+
+*Desenvolvido com dedicação por Pedro Stein.*
+
+```
