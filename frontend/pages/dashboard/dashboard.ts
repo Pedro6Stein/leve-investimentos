@@ -261,9 +261,9 @@ async function renderTasks(isManager: boolean) {
         const pending = tasks.filter(t => t.status === 1).length;
         const completed = tasks.filter(t => t.status !== 1).length;
 
-        const elTotal = document.getElementById('statsTotal');
-        const elPending = document.getElementById('statsPending');
-        const elCompleted = document.getElementById('statsCompleted');
+        const elTotal = document.getElementById('statTotal');
+        const elPending = document.getElementById('statPending');
+        const elCompleted = document.getElementById('statDone');
 
         if (elTotal) elTotal.textContent = String(total);
         if (elPending) elPending.textContent = String(pending);
