@@ -1,0 +1,6 @@
+@LeveInvestimentos.API_HostAddress = http://localhost:5211
+
+GET {{LeveInvestimentos.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
