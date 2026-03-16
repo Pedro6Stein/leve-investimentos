@@ -1,6 +1,10 @@
 import { HttpClient } from './httpClient.js';
 
-const API_BASE_URL = 'http://localhost:3333/api';
+//NODE: 
+//const API_BASE_URL = 'http://localhost:3333/api';
+
+//C#
+const API_BASE_URL = 'https://localhost:7065/api';
 
 export const api = new HttpClient(API_BASE_URL);
 
