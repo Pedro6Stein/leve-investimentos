@@ -43,6 +43,16 @@ builder.Services.AddAuthentication(options => // Configura os esquemas de autent
 // Adiciona autorização
 builder.Services.AddAuthorization();
 
+builder.Services.AddCors(options => // Configura CORS para permitir requisições de qualquer origem (Meu frontendzinho)
+{
+    options.AddPolicy("DefaultPolicy", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 var app = builder.Build();
 
 // Área do Pipeline HTTP (Middlewares)
@@ -53,6 +63,7 @@ if (app.Environment.IsDevelopment()) // Somente em desenvolvimento, habilitamos 
 }
 
 app.UseHttpsRedirection(); //dispara os middlewares de autenticação e autorização antes dos controllers
+app.UseCors("DefaultPolicy"); // Habilita CORS com a política definida
 
 app.UseAuthentication(); // Verifica o token JWT e autentica o utilizador
 

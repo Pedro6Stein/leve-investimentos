@@ -18,14 +18,15 @@ namespace LeveInvestimentos.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            var token = await _authService.AuthenticateAsync(request);
+            var result = await _authService.AuthenticateAsync(request);
 
-            if (token == null)
+            if (result == null)
             {
-                return Unauthorized(new { message = "E-mail ou senha incorretos." });
+                return Unauthorized(new { error = "Credenciais inválidas." });
             }
 
-            return Ok(new { token });
+            // Retorna o objeto completo (user + token) formatado no AuthService
+            return Ok(result);
         }
     }
 }

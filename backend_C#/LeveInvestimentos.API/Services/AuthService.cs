@@ -19,20 +19,20 @@ namespace LeveInvestimentos.API.Services
             _configuration = configuration;
         }
 
-        public async Task<string?> AuthenticateAsync(LoginRequest request)
+        public async Task<object?> AuthenticateAsync(LoginRequest request)
         {
-            // 1. Busca o utilizador pelo e-mail
+            // Busca o utilizador pelo e-mail
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
             if (user == null) return null;
 
-            // 2. Verifica se a senha confere com o Hash salvo no banco
+            // Verifica se a senha confere com o Hash salvo no banco
             bool isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
             if (!isPasswordValid) return null;
 
-            // 3. Define as permissões (Roles) com base na flag IsManager
+            // Define as permissões (Roles) com base na flag IsManager
             var role = user.IsManager ? "Manager" : "Employee";
 
-            // 4. Cria as "Reivindicações" (Claims) que vão dentro do token
+            // Cria as "Reivindicações" (Claims) que vão dentro do token
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
@@ -52,7 +52,20 @@ namespace LeveInvestimentos.API.Services
                 signingCredentials: creds
             );
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+            // 6. Retorno idêntico ao esperado pelo frontend (Node.js)
+            return new
+            {
+                user = new
+                {
+                    id = user.Id,
+                    fullName = user.FullName,
+                    email = user.Email,
+                    isManager = user.IsManager
+                },
+                token = tokenString
+            };
         }
     }
 }
