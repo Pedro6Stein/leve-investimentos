@@ -29,10 +29,14 @@ namespace LeveInvestimentos.API.Data
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<TaskItem>()
-                .HasOne(t => t.Assignee)
-                .WithMany(u => u.AssignedTasks)
-                .HasForeignKey(t => t.AssigneeId)
+                .HasOne(t => t.Assignee) // A tarefa tem um gerente.
+                .WithMany(u => u.AssignedTasks) // O gerente pode ter muitas tarefas atribuídas a ele.
+                .HasForeignKey(t => t.AssigneeId) // A chave estrangeira é AssigneeId na tabela TaskItem. (Nossa ligacao)
                 .OnDelete(DeleteBehavior.NoAction);
         }
+
+        
+
+
     }
 }
