@@ -1,6 +1,7 @@
 ﻿using LeveInvestimentos.API.Data;
 using LeveInvestimentos.API.DTOs;
 using LeveInvestimentos.API.Entities;
+using LeveInvestimentos.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,22 +11,24 @@ namespace LeveInvestimentos.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] // Protege todas as rotas de tarefas
+    [Authorize]
     public class TasksController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly EmailService _emailService;
 
-        public TasksController(AppDbContext context)
+        public TasksController(AppDbContext context, EmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
 
-        // CRIAR TAREFA (Apenas Gestores)
         [HttpPost]
         [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Create([FromBody] CreateTaskRequest request)
         {
             var managerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var managerEmail = User.FindFirst(ClaimTypes.Email)?.Value;
 
             var task = new TaskItem
             {
@@ -33,16 +36,21 @@ namespace LeveInvestimentos.API.Controllers
                 DueDate = request.DueDate,
                 ManagerId = managerId,
                 AssigneeId = request.AssigneeId,
-                Status = 1 // 1 = Pendente
+                Status = 1
             };
 
             _context.Tasks.Add(task);
             await _context.SaveChangesAsync();
 
+            var assignee = await _context.Users.FindAsync(request.AssigneeId);
+            if (assignee != null && !string.IsNullOrEmpty(managerEmail))
+            {
+                _ = _emailService.SendTaskAssignedEmailAsync(assignee.Email, managerEmail, assignee.FullName, task.Description);
+            }
+
             return StatusCode(201, task);
         }
 
-        // LISTAR MINHAS TAREFAS 
         [HttpGet("my")]
         public async Task<IActionResult> ListMyTasks()
         {
@@ -68,9 +76,8 @@ namespace LeveInvestimentos.API.Controllers
             return Ok(tasks);
         }
 
-        // LISTAR TAREFAS
         [HttpGet("managed")]
-        [Authorize(Roles = "Manager")] // Somente gestores podem acessar esta rota
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> ListManagedTasks()
         {
             var managerId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
@@ -95,24 +102,28 @@ namespace LeveInvestimentos.API.Controllers
             return Ok(tasks);
         }
 
-        // ONCLUIR TAREFA
         [HttpPatch("{id}/complete")]
         public async Task<IActionResult> Complete(Guid id)
         {
-            var task = await _context.Tasks.FindAsync(id);
+            var task = await _context.Tasks
+                .Include(t => t.Manager)
+                .Include(t => t.Assignee)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
             if (task == null) return NotFound(new { error = "Tarefa não encontrada." });
 
-            task.Status = 2; // 2 = Concluída
+            task.Status = 2;
             task.CompletedAt = DateTime.UtcNow;
-
             await _context.SaveChangesAsync();
 
-            // TODO: Adicionar lógica de envio de E-mail para o Gestor
+            if (task.Manager != null && task.Assignee != null)
+            {
+                _ = _emailService.SendTaskCompletedEmailAsync(task.Manager.Email, task.Manager.FullName, task.Assignee.FullName, task.Description);
+            }
 
             return Ok(task);
         }
 
-        // ATUALIZAR TAREFA (Apenas Gestores)
         [HttpPut("{id}")]
         [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Update(Guid id, [FromBody] CreateTaskRequest request)
@@ -123,8 +134,15 @@ namespace LeveInvestimentos.API.Controllers
             task.Description = request.Description;
             task.DueDate = request.DueDate;
             task.AssigneeId = request.AssigneeId;
-
             await _context.SaveChangesAsync();
+
+            var assignee = await _context.Users.FindAsync(task.AssigneeId);
+            var managerEmail = User.FindFirst(ClaimTypes.Email)?.Value;
+
+            if (assignee != null && !string.IsNullOrEmpty(managerEmail))
+            {
+                _ = _emailService.SendTaskUpdatedEmailAsync(assignee.Email, managerEmail, assignee.FullName, task.Description);
+            }
 
             return Ok(task);
         }

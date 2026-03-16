@@ -4,12 +4,17 @@ using System.Text;
 using LeveInvestimentos.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models; 
+using Microsoft.OpenApi.Models;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ccadastrar o que a aplicaçao precisa
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -44,6 +49,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Regista o AuthService para Injeção de Dependência
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<EmailService>();
 
 // Configura a Autenticação via JWT
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key is missing"); ;//
