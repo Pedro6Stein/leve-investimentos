@@ -1,0 +1,11 @@
+# Ignora pastas do Visual Studio em qualquer lugar
+.vs/
+**/.vs/
+[Bb]in/
+**/[Bb]in/
+[Oo]bj/
+**/[Oo]bj/
+
+# Ficheiros de utilizador e log
+*.user
+*.log
